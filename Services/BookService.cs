@@ -16,12 +16,19 @@ public class BookService : IBookService
   }
   public Task AddBookAsync(Book book)
   {
-    throw new NotImplementedException();
+    _context.Books.Add(book);
+    return _context.SaveChangesAsync();
   }
 
   public Task DeleteBookAsync(int id)
   {
-    throw new NotImplementedException();
+    var book = _context.Books.Find(id);
+    if (book != null)
+    {
+      _context.Books.Remove(book);
+      return _context.SaveChangesAsync();
+    }
+    return Task.CompletedTask;
   }
 
   public Task<IEnumerable<Book>> GetAllBooksAsync(string userId)
@@ -31,18 +38,24 @@ public class BookService : IBookService
       .AsEnumerable());
   }
 
-  public Task<Book> GetBookByIdAsync(int id)
+  public Task<Book?> GetBookByIdAsync(string userId, int id)
   {
-    throw new NotImplementedException();
+    return _context.Books
+      .Where(b => b.UserId == userId)
+      .Include(b => b.User)
+      .FirstOrDefaultAsync(b => b.Id == id);
   }
 
   public Task<IEnumerable<Book>> SearchBooksAsync(string searchTerm)
   {
-    throw new NotImplementedException();
+    return Task.FromResult(_context.Books
+      .Where(b => (b.Title != null && b.Title.Contains(searchTerm)) || (b.Author != null && b.Author.Contains(searchTerm)))
+      .AsEnumerable());
   }
 
   public Task UpdateBookAsync(Book book)
   {
-    throw new NotImplementedException();
+    _context.Books.Update(book);
+    return _context.SaveChangesAsync();
   }
 }

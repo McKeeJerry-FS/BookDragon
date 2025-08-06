@@ -5,7 +5,7 @@ namespace BookDragon.Services.Interfaces;
 
 public interface IBookService
 {
-  Task<Book> GetBookByIdAsync(int id);
+  Task<Book> GetBookByIdAsync(string userId, int id);
   Task<IEnumerable<Book>> GetAllBooksAsync(string userId);
   Task AddBookAsync(Book book);
   Task UpdateBookAsync(Book book);

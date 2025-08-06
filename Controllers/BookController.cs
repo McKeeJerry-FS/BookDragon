@@ -38,7 +38,12 @@ namespace BookDragon.Controllers
         [HttpGet("Details/{id}")]
         public async Task<ActionResult<Book>> GetBookDetails(int id)
         {
-            var book = await _bookService.GetBookByIdAsync(id);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Unauthorized("User ID not found.");
+            }
+            var book = await _bookService.GetBookByIdAsync(userId, id);
             if (book == null)
             {
                 return NotFound();
@@ -66,7 +71,12 @@ namespace BookDragon.Controllers
                 return BadRequest("Invalid book data.");
             }
 
-            var existingBook = await _bookService.GetBookByIdAsync(id);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Unauthorized("User ID not found.");
+            }
+            var existingBook = await _bookService.GetBookByIdAsync(userId, id);
             if (existingBook == null)
             {
                 return NotFound();
@@ -79,7 +89,12 @@ namespace BookDragon.Controllers
         [HttpDelete("Delete/{id}")]
         public async Task<ActionResult> DeleteBook(int id)
         {
-            var existingBook = await _bookService.GetBookByIdAsync(id);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Unauthorized("User ID not found.");
+            }
+            var existingBook = await _bookService.GetBookByIdAsync(userId, id);
             if (existingBook == null)
             {
                 return NotFound();
@@ -89,6 +104,5 @@ namespace BookDragon.Controllers
             return NoContent();
         }
 
-        
     }
 }
