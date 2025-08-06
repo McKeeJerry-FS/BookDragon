@@ -67,3 +67,7 @@ body {
   padding: 10px 20px;
   border-radius: 5px;
 }
+
+.lair{
+  background-image: url("/img/literary_lair.jpg");
+}

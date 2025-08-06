@@ -1,0 +1,39 @@
+﻿@{
+    ViewData["Title"] = "Book List";
+}
+
+<div class="text-center">
+    <h1 class="title">Welcome to the BookDragon's Lair</h1>
+    <h2 class="subtitle">Your personal book collection awaits</h2>
+</div>
+
+<div>
+    <h3 class="subtitle">Your Books</h3>
+    <ul class="list-unstyled text-light">
+        <li>
+            <div class="card mt-3">
+                <div class="card-title">
+                    <h4>Book 1</h4>
+                </div>
+            </div>
+        </li>
+        <li>
+            <div class="card mt-3">
+                <div class="card-title">
+                    <h4>Book 2</h4>
+                </div>
+            </div>
+        </li>
+        <li>
+            <div class="card mt-3">
+                <div class="card-title">
+                    <h4>Book 3</h4>
+                </div>
+            </div>
+        </li>
+    </ul>   
+</div>
+
+<div class="d-flex justify-content-center align-items-center mt-3">
+    <a class="btn lairBtn" asp-area="" asp-controller="Home" asp-action="Index">Return to Home</a>
+</div>

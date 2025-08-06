@@ -18,6 +18,11 @@ namespace BookDragon.Controllers
             return View();
         }
 
+        public IActionResult BookList()
+        {
+            return View();
+        }
+
         public IActionResult Privacy()
         {
             return View();
