@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using BookDragon.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookDragon.Controllers
@@ -18,6 +19,7 @@ namespace BookDragon.Controllers
             return View();
         }
 
+        [Authorize]
         public IActionResult BookList()
         {
             return View();

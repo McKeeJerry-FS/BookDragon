@@ -30,5 +30,13 @@ public class Book
 
   [Display(Name = "Cover Image URL")]
   public string? CoverImageUrl { get; set; }
+
+  // Foreign key for the user who owns this book
+  [Required]
+  public string? UserId { get; set; }
+
+  // Navigation property
+  [ForeignKey("UserId")]
+  public virtual AppUser? User { get; set; }
   
 }
