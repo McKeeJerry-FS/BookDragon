@@ -34,5 +34,61 @@ namespace BookDragon.Controllers
             return Ok(books);
         }
 
+        // Other actions (Create, Edit, Delete) can be added here
+        [HttpGet("Details/{id}")]
+        public async Task<ActionResult<Book>> GetBookDetails(int id)
+        {
+            var book = await _bookService.GetBookByIdAsync(id);
+            if (book == null)
+            {
+                return NotFound();
+            }
+            return Ok(book);
+        }
+
+        [HttpPost("Create")]
+        public async Task<ActionResult> CreateBook([FromBody] Book book)
+        {
+            if (book == null)
+            {
+                return BadRequest("Invalid book data.");
+            }
+
+            await _bookService.AddBookAsync(book);
+            return CreatedAtAction(nameof(GetBookDetails), new { id = book.Id }, book);
+        }
+
+        [HttpPut("Edit/{id}")]
+        public async Task<ActionResult> EditBook(int id, [FromBody] Book book)
+        {
+            if (book == null || book.Id != id)
+            {
+                return BadRequest("Invalid book data.");
+            }
+
+            var existingBook = await _bookService.GetBookByIdAsync(id);
+            if (existingBook == null)
+            {
+                return NotFound();
+            }
+
+            await _bookService.UpdateBookAsync(book);
+            return NoContent();
+        }
+
+        [HttpDelete("Delete/{id}")]
+        public async Task<ActionResult> DeleteBook(int id)
+        {
+            var existingBook = await _bookService.GetBookByIdAsync(id);
+            if (existingBook == null)
+            {
+                return NotFound();
+            }
+
+            await _bookService.DeleteBookAsync(id);
+            return NoContent();
+        }
+
+        
     }
 }
