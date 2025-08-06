@@ -38,12 +38,17 @@ public class BookService : IBookService
       .AsEnumerable());
   }
 
-  public Task<Book?> GetBookByIdAsync(string userId, int id)
+  public async Task<Book> GetBookByIdAsync(string userId, int id)
   {
-    return _context.Books
+    var book = await _context.Books
       .Where(b => b.UserId == userId)
       .Include(b => b.User)
       .FirstOrDefaultAsync(b => b.Id == id);
+
+    if (book == null)
+      throw new InvalidOperationException("Book not found.");
+
+    return book;
   }
 
   public Task<IEnumerable<Book>> SearchBooksAsync(string searchTerm)
