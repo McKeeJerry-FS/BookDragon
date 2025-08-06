@@ -19,4 +19,50 @@ html {
 
 body {
   margin-bottom: 60px;
+  background-image: url("/img/dragons-lair-scenic-backdrop-hero-08a62f.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  
+}
+
+/* Google Fonts */
+.manufacturing-consent-regular {
+  font-family: "Manufacturing Consent", system-ui;
+  font-weight: 400;
+  font-style: normal;
+}
+
+
+.merienda-normal {
+  font-family: "Merienda", cursive;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* Classes */
+.title {
+  font-family: "Manufacturing Consent", system-ui;
+  font-weight: 500;
+  font-size: 6rem;
+  color: #555555;
+}
+
+.subtitle {
+  font-family: "Merienda", cursive;
+  font-weight: 400;
+  font-size: 2rem;
+  color: #9e9e9e;
+}
+
+.lairBtn{
+  font-family: "Merienda", system-ui;
+  font-weight: 500;
+  font-size: 1.5rem;
+  color: #9e9e9e;
+  border: #555555 solid 2px;
+  padding: 10px 20px;
+  border-radius: 5px;
 }
