@@ -71,3 +71,7 @@ body {
 .lair{
   background-image: url("/img/literary_lair.jpg");
 }
+
+.coverImg{
+    height: 150px;
+}

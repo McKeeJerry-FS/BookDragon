@@ -1,0 +1,36 @@
+﻿@model BookDragon.Models.Category
+
+@{
+    ViewData["Title"] = "Add Category";
+    Layout = "_Layout";
+}
+
+<h1 class="display-2 title">@ViewData["Title"]</h1>
+
+<form asp-action="AddCategory" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label text-danger"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label text-danger"></label>
+        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="ImageFile" class="form-label text-danger"></label>
+        <input asp-for="ImageFile" type="file" class="form-control" />
+        <span asp-validation-for="ImageFile" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <button type="submit" class="btn btn-primary">Add Category</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+

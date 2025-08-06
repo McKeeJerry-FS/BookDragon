@@ -3,9 +3,10 @@
 @{
     ViewData["Title"] = "Add Book";
     Layout = "_Layout";
+    var categories = ViewBag.Categories as List<SelectListItem>;
 }
 
-<h1>@ViewData["Title"]</h1>
+<h1 class="title">@ViewData["Title"]</h1>
 
 <form asp-action="Create" method="post">
     <div class="mb-3">
@@ -22,6 +23,13 @@
         <label asp-for="Genre" class="form-label text-danger"></label>
         <input asp-for="Genre" class="form-control" />
         <span asp-validation-for="Genre" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="CategoryId" class="form-label text-danger"></label>
+        <select asp-for="CategoryId" class="form-control" asp-items="categories">
+            <option value="">-- Select Category --</option>
+        </select>
+        <span asp-validation-for="CategoryId" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label asp-for="PublishedDate" class="form-label text-danger"></label>
