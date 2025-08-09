@@ -6,79 +6,74 @@
 
 <h1 class="title">Book Details</h1>
 
-<div>
-    <h4 class="subtitle">@Html.DisplayFor(model => model.Title)</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2 text-light">
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd class="col-sm-10 text-light">
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt class="col-sm-2 text-light">
-            @Html.DisplayNameFor(model => model.Author)
-        </dt>
-        <dd class="col-sm-10 text-light">
-            @Html.DisplayFor(model => model.Author)
-        </dd>
-        <dt class="col-sm-2 text-light">
-            @Html.DisplayNameFor(model => model.Genre)
-        </dt>
-        <dd class="col-sm-10 text-light">
-            @Html.DisplayFor(model => model.Genre)
-        </dd>
-        <dt class="col-sm-2 text-light">
-            @Html.DisplayNameFor(model => model.PublishedDate)
-        </dt>
-        <dd class="col-sm-10 text-light">
-            @Html.DisplayFor(model => model.PublishedDate)
-        </dd>
-        <dt class="col-sm-2 text-light">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class="col-sm-10 text-light">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class="col-sm-2 text-light">
-            @Html.DisplayNameFor(model => model.PageCount)
-        </dt>
-        <dd class="col-sm-10 text-light">
-            @Html.DisplayFor(model => model.PageCount)
-        </dd>
-        <dt class="col-sm-2 text-light">
-            @Html.DisplayNameFor(model => model.CoverImageUrl)
-        </dt>
-        <dd class="col-sm-10 text-light">
-            @Html.DisplayFor(model => model.CoverImageUrl)
-        </dd>
-        @* <dt class="col-sm-2 text-light">
-            @Html.DisplayNameFor(model => model.ImageData)
-        </dt>
-        <dd class="col-sm-10 text-light">
-            @Html.DisplayFor(model => model.ImageData)
-        </dd>
-        <dt class="col-sm-2 text-light">
-            @Html.DisplayNameFor(model => model.ImageType)
-        </dt>
-        <dd class="col-sm-10 text-light">
-            @Html.DisplayFor(model => model.ImageType)
-        </dd> *@
-        @* <dt class="col-sm-2 text-light">
-            @Html.DisplayNameFor(model => model.User)
-        </dt>
-        <dd class="col-sm-10 text-light">
-            @Html.DisplayFor(model => model.User.Id)
-        </dd> *@
-        <dt class="col-sm-2 text-light">
-            @Html.DisplayNameFor(model => model.Category)
-        </dt>
-        <dd class="col-sm-10 text-light">
-            @Html.DisplayFor(model => model.Category.Name)
-        </dd>
-    </dl>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Cover Image Column -->
+        <div class="col-md-4 d-flex justify-content-center align-items-start">
+            <div class="text-center">
+                @if (!string.IsNullOrEmpty(Model.CoverImageUrl))
+                {
+                    <img src="@Model.CoverImageUrl" alt="@Model.Title Cover" class="img-fluid rounded shadow" style="max-width: 300px; max-height: 400px;" />
+                }
+                else if (Model.ImageData != null && Model.ImageData.Length > 0)
+                {
+                    var imageBase64 = Convert.ToBase64String(Model.ImageData);
+                    var imageSrc = $"data:{Model.ImageType};base64,{imageBase64}";
+                    <img src="@imageSrc" alt="@Model.Title Cover" class="img-fluid rounded shadow" style="max-width: 300px; max-height: 400px;" />
+                }
+                else
+                {
+                    <img src="/img/img_placeholder.jpg" alt="No Cover Available" class="img-fluid rounded shadow" style="max-width: 300px; max-height: 400px;" />
+                }
+            </div>
+        </div>
+        
+        <!-- Book Information Column -->
+        <div class="col-md-8">
+            <h4 class="subtitle text-light mb-4">@Html.DisplayFor(model => model.Title)</h4>
+            <hr />
+            <dl class="row">
+                
+                <dt class="col-sm-3 text-light">
+                    @Html.DisplayNameFor(model => model.Author)
+                </dt>
+                <dd class="col-sm-9 text-light">
+                    @Html.DisplayFor(model => model.Author)
+                </dd>  
+                
+                <dt class="col-sm-3 text-light">
+                    @Html.DisplayNameFor(model => model.PublishedDate)
+                </dt>
+                <dd class="col-sm-9 text-light">
+                    @Html.DisplayFor(model => model.PublishedDate)
+                </dd>
+                
+                <dt class="col-sm-3 text-light">
+                    @Html.DisplayNameFor(model => model.Category)
+                </dt>
+                <dd class="col-sm-9 text-light">
+                    @Html.DisplayFor(model => model.Category.Name)
+                </dd>
+                
+                <dt class="col-sm-3 text-light">
+                    @Html.DisplayNameFor(model => model.PageCount)
+                </dt>
+                <dd class="col-sm-9 text-light">
+                    @Html.DisplayFor(model => model.PageCount)
+                </dd>
+                
+                <dt class="col-sm-3 text-light">
+                    @Html.DisplayNameFor(model => model.Description)
+                </dt>
+                <dd class="col-sm-9 text-light">
+                    @Html.DisplayFor(model => model.Description)
+                </dd>
+            </dl>
+        </div>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<div class="mt-4">
+    <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">Edit</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
 </div>
