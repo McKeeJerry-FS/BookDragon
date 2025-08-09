@@ -4,7 +4,7 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1 class="subtitle text-danger">Lair's Inventory</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -13,14 +13,17 @@
     <thead>
         <tr>
             <th>
+                Cover Image
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.Title)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Author)
             </th>
-            <th>
+            @* <th>
                 @Html.DisplayNameFor(model => model.Genre)
-            </th>
+            </th> *@
             <th>
                 @Html.DisplayNameFor(model => model.PublishedDate)
             </th>
@@ -29,18 +32,6 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.PageCount)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CoverImageUrl)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ImageData)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ImageType)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.User)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Category)
@@ -52,14 +43,30 @@
 @foreach (var item in Model) {
         <tr>
             <td>
+                @if (!string.IsNullOrEmpty(item.CoverImageUrl))
+                {
+                    <img src="@item.CoverImageUrl" alt="@item.Title Cover" class="img-thumbnail" style="max-width: 80px; max-height: 100px;" />
+                }
+                else if (item.ImageData != null && item.ImageData.Length > 0)
+                {
+                    var imageBase64 = Convert.ToBase64String(item.ImageData);
+                    var imageSrc = $"data:{item.ImageType};base64,{imageBase64}";
+                    <img src="@imageSrc" alt="@item.Title Cover" class="img-thumbnail" style="max-width: 80px; max-height: 100px;" />
+                }
+                else
+                {
+                    <img src="/img/img_placeholder.jpg" alt="No Cover Available" class="img-thumbnail" style="max-width: 80px; max-height: 100px;" />
+                }
+            </td>
+            <td>
                 @Html.DisplayFor(modelItem => item.Title)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Author)
             </td>
-            <td>
+            @* <td>
                 @Html.DisplayFor(modelItem => item.Genre)
-            </td>
+            </td> *@
             <td>
                 @Html.DisplayFor(modelItem => item.PublishedDate)
             </td>
@@ -68,18 +75,6 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.PageCount)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CoverImageUrl)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ImageData)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ImageType)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.Id)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Category.Name)

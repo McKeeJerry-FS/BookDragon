@@ -30,6 +30,10 @@ public class Book
 
     [Display(Name = "Cover Image URL")]
     public string? CoverImageUrl { get; set; }
+    
+    [Required]
+    [Display(Name = "Category")]
+    [Range(1, int.MaxValue, ErrorMessage = "Please select a category")]
     public int CategoryId { get; set; } // Foreign Key
 
     // Image Properties

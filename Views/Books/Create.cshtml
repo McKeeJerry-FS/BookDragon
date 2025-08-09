@@ -4,52 +4,53 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
-
-<h4>Book</h4>
+<h1 class="subtitle text-danger">Add a New Book</h1>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Title" class="control-label text-danger"></label>
+                <label asp-for="Title" class="control-label text-white"></label>
                 <input asp-for="Title" class="form-control" />
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Author" class="control-label text-danger"></label>
+                <label asp-for="Author" class="control-label text-white"></label>
                 <input asp-for="Author" class="form-control" />
                 <span asp-validation-for="Author" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Genre" class="control-label text-danger"></label>
+            @* <div class="form-group">
+                <label asp-for="Genre" class="control-label text-white"></label>
                 <input asp-for="Genre" class="form-control" />
                 <span asp-validation-for="Genre" class="text-danger"></span>
-            </div>
+            </div> *@
             <div class="form-group">
-                <label asp-for="PublishedDate" class="control-label text-danger"></label>
+                <label asp-for="PublishedDate" class="control-label text-white"></label>
                 <input asp-for="PublishedDate" class="form-control" type="date" />
                 <span asp-validation-for="PublishedDate" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Description" class="control-label text-danger"></label>
+                <label asp-for="Description" class="control-label text-white"></label>
                 <input asp-for="Description" class="form-control" />
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="PageCount" class="control-label text-danger"></label>
+                <label asp-for="PageCount" class="control-label text-white"></label>
                 <input asp-for="PageCount" class="form-control" />
                 <span asp-validation-for="PageCount" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="CoverImageUrl" class="control-label text-danger"></label>
+                <label asp-for="CoverImageUrl" class="control-label text-white"></label>
                 <input asp-for="CoverImageUrl" class="form-control" />
                 <span asp-validation-for="CoverImageUrl" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="CategoryId" class="control-label text-danger"></label>
-                <select asp-for="CategoryId" class ="form-control" asp-items="ViewBag.CategoryId"></select>
+                <label asp-for="CategoryId" class="control-label text-white">Category</label>
+                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId">
+                    <option value="">-- Select a Category --</option>
+                </select>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
             </div>
             @* <div class="form-group">
                 <label asp-for="ImageData" class="control-label text-danger"></label>
@@ -61,11 +62,11 @@
                 <input asp-for="ImageType" class="form-control" />
                 <span asp-validation-for="ImageType" class="text-danger"></span>
             </div> *@
-            <div class="form-group">
+            <div class="form-group" hidden>
                 <label asp-for="UserId" class="control-label text-danger"></label>
                 <select asp-for="UserId" class ="form-control" asp-items="ViewBag.UserId"></select>
             </div>
-            <div class="form-group">
+            <div class="form-group mt-3">
                 <input type="submit" value="Create" class="btn btn-secondary" />
             </div>
         </form>
