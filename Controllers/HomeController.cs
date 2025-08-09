@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace BookDragon.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -22,30 +23,27 @@ namespace BookDragon.Controllers
             _context = context;
         }
 
+        [AllowAnonymous]
         public IActionResult Index()
         {
             return View();
         }
 
-        [Authorize]
         public IActionResult BookList()
         {
             return View();
         }
 
-        [Authorize]
         public IActionResult AddBook()
         {
             return View();
         }
 
-        [Authorize]
         public IActionResult AddCategory()
         {
             return View();
         }
 
-        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Book book)
@@ -71,7 +69,14 @@ namespace BookDragon.Controllers
             return View("AddBook", book);
         }
 
+        [AllowAnonymous]
         public IActionResult Privacy()
+        {
+            return View();
+        }
+
+        [AllowAnonymous]
+        public IActionResult About()
         {
             return View();
         }
