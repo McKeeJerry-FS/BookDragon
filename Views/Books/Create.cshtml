@@ -52,6 +52,11 @@
                 </select>
                 <span asp-validation-for="CategoryId" class="text-danger"></span>
             </div>
+            <div class="form-group">
+                <label asp-for="Rating" class="control-label text-white"></label>
+                <input asp-for="Rating" class="form-control" />
+                <span asp-validation-for="Rating" class="text-danger"></span>
+            </div>
             @* <div class="form-group">
                 <label asp-for="ImageData" class="control-label text-danger"></label>
                 <input asp-for="ImageData" class="form-control" />

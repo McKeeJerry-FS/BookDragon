@@ -36,6 +36,15 @@ public class Book
     [Range(1, int.MaxValue, ErrorMessage = "Please select a category")]
     public int CategoryId { get; set; } // Foreign Key
 
+    // Rating Properties
+    [Display(Name = "Rating")]
+    [Range(1, 5, ErrorMessage = "Rating must be between 1 and 5 stars")]
+    public int? Rating { get; set; }
+
+    [Display(Name = "Rating Reason")]
+    [StringLength(500, ErrorMessage = "Rating reason cannot exceed 500 characters")]
+    public string? RatingReason { get; set; }
+
     // Image Properties
     [NotMapped]
     public IFormFile? ImageFile { get; set; }
