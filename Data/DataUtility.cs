@@ -77,7 +77,6 @@ namespace BookDragon.Data
             var dbContextSvc = serviceProvider.GetRequiredService<ApplicationDbContext>();
             var userManagerSvc = serviceProvider.GetRequiredService<UserManager<AppUser>>();
             var configurationSvc = serviceProvider.GetRequiredService<IConfiguration>();
-            var roleManagerSvc = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
             // align the database by checking the migrations
             await dbContextSvc.Database.MigrateAsync();
