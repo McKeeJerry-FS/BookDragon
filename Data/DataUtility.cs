@@ -9,10 +9,35 @@ namespace BookDragon.Data
     {
         public static string GetConnectionString(IConfiguration configuration)
         {
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            // First check for Railway's DATABASE_URL
             var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
-            return string.IsNullOrEmpty(databaseUrl) ? connectionString! : BuildConnectionString(databaseUrl);
+            if (!string.IsNullOrEmpty(databaseUrl))
+            {
+                return BuildConnectionString(databaseUrl);
+            }
+
+            // Check for other Railway environment variables
+            var railwayHost = Environment.GetEnvironmentVariable("PGHOST");
+            var railwayPort = Environment.GetEnvironmentVariable("PGPORT");
+            var railwayUser = Environment.GetEnvironmentVariable("PGUSER");
+            var railwayPassword = Environment.GetEnvironmentVariable("PGPASSWORD");
+            var railwayDatabase = Environment.GetEnvironmentVariable("PGDATABASE");
+
+            if (!string.IsNullOrEmpty(railwayHost) && !string.IsNullOrEmpty(railwayDatabase))
+            {
+                return BuildConnectionStringFromParts(railwayHost, railwayPort, railwayUser, railwayPassword, railwayDatabase);
+            }
+
+            // Fallback to configuration
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            if (!string.IsNullOrEmpty(connectionString))
+            {
+                return connectionString;
+            }
+
+            throw new InvalidOperationException("No database connection string found. Please set DATABASE_URL environment variable or configure DefaultConnection.");
         }
+
         private static string BuildConnectionString(string databaseUrl)
         {
             //Provides an object representation of a uniform resource identifier (URI) and easy access to the parts of the URI.
@@ -26,6 +51,21 @@ namespace BookDragon.Data
                 Username = userInfo[0],
                 Password = userInfo[1],
                 Database = databaseUri.LocalPath.TrimStart('/'),
+                SslMode = SslMode.Prefer,
+                TrustServerCertificate = true
+            };
+            return builder.ToString();
+        }
+
+        private static string BuildConnectionStringFromParts(string host, string port, string user, string password, string database)
+        {
+            var builder = new NpgsqlConnectionStringBuilder
+            {
+                Host = host,
+                Port = !string.IsNullOrEmpty(port) ? int.Parse(port) : 5432,
+                Username = user,
+                Password = password,
+                Database = database,
                 SslMode = SslMode.Prefer,
                 TrustServerCertificate = true
             };
