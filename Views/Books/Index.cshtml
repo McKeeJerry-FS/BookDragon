@@ -21,9 +21,6 @@
             <th>
                 @Html.DisplayNameFor(model => model.Author)
             </th>
-            @* <th>
-                @Html.DisplayNameFor(model => model.Genre)
-            </th> *@
             <th>
                 @Html.DisplayNameFor(model => model.PublishedDate)
             </th>
@@ -34,7 +31,13 @@
                 @Html.DisplayNameFor(model => model.PageCount)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.BookType)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.Category)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Rating)
             </th>
             <th></th>
         </tr>
@@ -64,9 +67,6 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Author)
             </td>
-            @* <td>
-                @Html.DisplayFor(modelItem => item.Genre)
-            </td> *@
             <td>
                 @Html.DisplayFor(modelItem => item.PublishedDate)
             </td>
@@ -76,8 +76,36 @@
             <td>
                 @Html.DisplayFor(modelItem => item.PageCount)
             </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BookType)
+                </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Category.Name)
+            </td>
+            <td>
+                @if (item.Rating.HasValue)
+                {
+                    <div class="rating-display">
+                        <span class="rating-stars">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                if (i <= item.Rating.Value)
+                                {
+                                    <span style="color: #ffc107;">★</span>
+                                }
+                                else
+                                {
+                                    <span style="color: #ddd;">★</span>
+                                }
+                            }
+                        </span>
+                        <small>(@item.Rating.Value/5)</small>
+                    </div>
+                }
+                else
+                {
+                    <span class="text-muted">Not rated</span>
+                }
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

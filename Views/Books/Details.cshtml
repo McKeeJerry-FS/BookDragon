@@ -49,6 +49,13 @@
                 </dd>
                 
                 <dt class="col-sm-3 text-light">
+                    @Html.DisplayNameFor(model => model.BookType)
+                </dt>
+                <dd class="col-sm-9 text-light">
+                    @Html.DisplayFor(model => model.BookType)
+                </dd>
+
+                <dt class="col-sm-3 text-light">
                     @Html.DisplayNameFor(model => model.Category)
                 </dt>
                 <dd class="col-sm-9 text-light">
@@ -61,6 +68,47 @@
                 <dd class="col-sm-9 text-light">
                     @Html.DisplayFor(model => model.PageCount)
                 </dd>
+                
+                <dt class="col-sm-3 text-light">
+                    @Html.DisplayNameFor(model => model.Rating)
+                </dt>
+                <dd class="col-sm-9 text-light">
+                    @if (Model.Rating.HasValue)
+                    {
+                        <div class="rating-display">
+                            <span class="rating-stars" style="font-size: 1.5rem;">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    if (i <= Model.Rating.Value)
+                                    {
+                                        <span style="color: #ffc107;">★</span>
+                                    }
+                                    else
+                                    {
+                                        <span style="color: #ddd;">★</span>
+                                    }
+                                }
+                            </span>
+                            <span class="ms-2">(@Model.Rating.Value out of 5 stars)</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Not rated yet</span>
+                    }
+                </dd>
+
+                @if (!string.IsNullOrEmpty(Model.RatingReason))
+                {
+                    <dt class="col-sm-3 text-light">
+                        @Html.DisplayNameFor(model => model.RatingReason)
+                    </dt>
+                    <dd class="col-sm-9 text-light">
+                        <div class="rating-reason">
+                            <em>"@Html.DisplayFor(model => model.RatingReason)"</em>
+                        </div>
+                    </dd>
+                }
                 
                 <dt class="col-sm-3 text-light">
                     @Html.DisplayNameFor(model => model.Description)

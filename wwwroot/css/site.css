@@ -75,3 +75,36 @@ body {
 .coverImg{
     height: 150px;
 }
+
+/* Star Rating Styles */
+.star-rating {
+    direction: rtl;
+    display: inline-flex;
+    flex-direction: row-reverse;
+    font-size: 2rem;
+    unicode-bidi: bidi-override;
+}
+
+    .star-rating input[type="radio"] {
+        display: none;
+    }
+
+    .star-rating label {
+        color: #ddd;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+
+        .star-rating label:hover,
+        .star-rating label:hover ~ label,
+        .star-rating input[type="radio"]:checked ~ label {
+            color: #ffc107;
+        }
+
+        .star-rating label:hover {
+            color: #ffb300;
+        }
+
+.rating-input {
+    margin: 10px 0;
+}

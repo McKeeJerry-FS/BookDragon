@@ -59,7 +59,7 @@ namespace BookDragon.Controllers
         // POST: Books/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Author,Genre,PublishedDate,Description,PageCount,CoverImageUrl,CategoryId,ImageData,ImageType,UserId")] Book book)
+        public async Task<IActionResult> Create([Bind("Id,Title,Author,Genre,PublishedDate,Description,PageCount,CoverImageUrl,CategoryId,BookType,Rating,RatingReason,ImageData,ImageType,UserId")] Book book)
         {
             if (ModelState.IsValid)
             {
@@ -98,7 +98,7 @@ namespace BookDragon.Controllers
         // POST: Books/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Author,Genre,PublishedDate,Description,PageCount,CoverImageUrl,CategoryId,ImageData,ImageType,UserId")] Book book)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Author,Genre,PublishedDate,Description,PageCount,CoverImageUrl,CategoryId,BookType,Rating,RatingReason,ImageData,ImageType,UserId")] Book book)
         {
             if (id != book.Id)
             {

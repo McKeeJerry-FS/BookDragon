@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BookDragon.Enums;
 
 namespace BookDragon.Models;
 
@@ -35,6 +36,9 @@ public class Book
     [Display(Name = "Category")]
     [Range(1, int.MaxValue, ErrorMessage = "Please select a category")]
     public int CategoryId { get; set; } // Foreign Key
+
+    [Display(Name = "Book Type")]
+    public BookType? BookType { get; set; }
 
     // Rating Properties
     [Display(Name = "Rating")]
