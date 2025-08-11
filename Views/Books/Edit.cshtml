@@ -56,9 +56,21 @@
                 <span asp-validation-for="CategoryId" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="BookType" class="control-label text-white">Book Type</label>
+                <select asp-for="BookType" class="form-control" asp-items="Html.GetEnumSelectList<BookDragon.Enums.BookType>()">
+                    <option value="">-- Select Book Type --</option>
+                </select>
+                <span asp-validation-for="BookType" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <label asp-for="Rating" class="control-label text-white"></label>
                 <input asp-for="Rating" class="form-control" />
                 <span asp-validation-for="Rating" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RatingReason" class="control-label text-white">Why did you give this rating?</label>
+                <textarea asp-for="RatingReason" class="form-control" rows="3" placeholder="Share your thoughts about this book...">@Model.RatingReason</textarea>
+                <span asp-validation-for="RatingReason" class="text-danger"></span>
             </div>
             @* <div class="form-group">
                 <label asp-for="ImageData" class="control-label"></label>
