@@ -81,8 +81,26 @@ namespace BookDragon.Data
             // align the database by checking the migrations
             await dbContextSvc.Database.MigrateAsync();
 
-            
-            
+            // Seed Categories if none exist
+            if (!await dbContextSvc.Categories.AnyAsync())
+            {
+                var seedCategories = new List<Category>
+                {
+                    new() { Name = "Fantasy", Description = "Magical worlds and epic quests" },
+                    new() { Name = "Science Fiction", Description = "Futuristic tech and space adventures" },
+                    new() { Name = "Mystery", Description = "Whodunits and detective tales" },
+                    new() { Name = "Thriller", Description = "Edge-of-your-seat suspense" },
+                    new() { Name = "Romance", Description = "Love stories and relationships" },
+                    new() { Name = "Historical", Description = "Stories set in the past" },
+                    new() { Name = "Horror", Description = "Frightening and supernatural" },
+                    new() { Name = "Non-Fiction", Description = "Real events and factual works" },
+                    new() { Name = "Biography", Description = "Life stories of notable people" },
+                    new() { Name = "Young Adult", Description = "Fiction aimed at teen readers" }
+                };
+
+                dbContextSvc.Categories.AddRange(seedCategories);
+                await dbContextSvc.SaveChangesAsync();
+            }
         }
     }
 }

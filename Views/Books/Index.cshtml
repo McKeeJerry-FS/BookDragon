@@ -21,15 +21,15 @@
             <th>
                 @Html.DisplayNameFor(model => model.Author)
             </th>
-            <th>
+            @* <th>
                 @Html.DisplayNameFor(model => model.PublishedDate)
-            </th>
+            </th> *@
             <th>
                 @Html.DisplayNameFor(model => model.Description)
             </th>
-            <th>
+            @* <th>
                 @Html.DisplayNameFor(model => model.PageCount)
-            </th>
+            </th> *@
             <th>
                 @Html.DisplayNameFor(model => model.BookType)
             </th>
@@ -39,6 +39,12 @@
             <th>
                 @Html.DisplayNameFor(model => model.Rating)
             </th>
+            <th>
+                Have Read?
+            </th>
+            <th>
+                Wishlist?
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -46,11 +52,7 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @if (!string.IsNullOrEmpty(item.CoverImageUrl))
-                {
-                    <img src="@item.CoverImageUrl" alt="@item.Title Cover" class="img-thumbnail" style="max-width: 80px; max-height: 100px;" />
-                }
-                else if (item.ImageData != null && item.ImageData.Length > 0)
+                @if (item.ImageData != null && item.ImageData.Length > 0)
                 {
                     var imageBase64 = Convert.ToBase64String(item.ImageData);
                     var imageSrc = $"data:{item.ImageType};base64,{imageBase64}";
@@ -67,20 +69,20 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Author)
             </td>
-            <td>
+            @* <td>
                 @Html.DisplayFor(modelItem => item.PublishedDate)
-            </td>
+            </td> *@
             <td>
                 @(item.Description != null && item.Description.Length > 100 ? item.Description.Substring(0, 100) + "..." : item.Description)
             </td>
-            <td>
+            @* <td>
                 @Html.DisplayFor(modelItem => item.PageCount)
-            </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.BookType)
-                </td>
+            </td> *@
             <td>
-                @Html.DisplayFor(modelItem => item.Category.Name)
+                @Html.DisplayFor(modelItem => item.BookType)
+            </td>
+            <td>
+                @(item.Category != null ? item.Category.Name : "")
             </td>
             <td>
                 @if (item.Rating.HasValue)
@@ -106,6 +108,12 @@
                 {
                     <span class="text-muted">Not rated</span>
                 }
+            </td>
+            <td>
+                @(item.HaveRead ? "Yes" : "No")
+            </td>
+            <td>
+                @(item.IsWishlist ? "Yes" : "No")
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

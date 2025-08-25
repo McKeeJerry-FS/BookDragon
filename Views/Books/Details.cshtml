@@ -11,11 +11,7 @@
         <!-- Cover Image Column -->
         <div class="col-md-4 d-flex justify-content-center align-items-start">
             <div class="text-center">
-                @if (!string.IsNullOrEmpty(Model.CoverImageUrl))
-                {
-                    <img src="@Model.CoverImageUrl" alt="@Model.Title Cover" class="img-fluid rounded shadow" style="max-width: 300px; max-height: 400px;" />
-                }
-                else if (Model.ImageData != null && Model.ImageData.Length > 0)
+                @if (Model.ImageData != null && Model.ImageData.Length > 0)
                 {
                     var imageBase64 = Convert.ToBase64String(Model.ImageData);
                     var imageSrc = $"data:{Model.ImageType};base64,{imageBase64}";
@@ -41,12 +37,12 @@
                     @Html.DisplayFor(model => model.Author)
                 </dd>  
                 
-                <dt class="col-sm-3 text-light">
+                @* <dt class="col-sm-3 text-light">
                     @Html.DisplayNameFor(model => model.PublishedDate)
-                </dt>
-                <dd class="col-sm-9 text-light">
+                </dt> *@
+                @* <dd class="col-sm-9 text-light">
                     @Html.DisplayFor(model => model.PublishedDate)
-                </dd>
+                </dd> *@
                 
                 <dt class="col-sm-3 text-light">
                     @Html.DisplayNameFor(model => model.BookType)
@@ -59,15 +55,15 @@
                     @Html.DisplayNameFor(model => model.Category)
                 </dt>
                 <dd class="col-sm-9 text-light">
-                    @Html.DisplayFor(model => model.Category.Name)
+                    @(Model.Category != null ? Model.Category.Name : "")
                 </dd>
                 
-                <dt class="col-sm-3 text-light">
+                @* <dt class="col-sm-3 text-light">
                     @Html.DisplayNameFor(model => model.PageCount)
                 </dt>
                 <dd class="col-sm-9 text-light">
                     @Html.DisplayFor(model => model.PageCount)
-                </dd>
+                </dd> *@
                 
                 <dt class="col-sm-3 text-light">
                     @Html.DisplayNameFor(model => model.Rating)

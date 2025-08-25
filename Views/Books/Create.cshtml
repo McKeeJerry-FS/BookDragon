@@ -8,7 +8,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+    <form asp-action="Create" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Title" class="control-label text-white"></label>
@@ -25,25 +25,25 @@
                 <input asp-for="Genre" class="form-control" />
                 <span asp-validation-for="Genre" class="text-danger"></span>
             </div> *@
-            <div class="form-group">
+            @* <div class="form-group">
                 <label asp-for="PublishedDate" class="control-label text-white"></label>
                 <input asp-for="PublishedDate" class="form-control" type="date" />
                 <span asp-validation-for="PublishedDate" class="text-danger"></span>
-            </div>
+            </div> *@
             <div class="form-group">
                 <label asp-for="Description" class="control-label text-white"></label>
                 <input asp-for="Description" class="form-control" />
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            @* <div class="form-group">
                 <label asp-for="PageCount" class="control-label text-white"></label>
                 <input asp-for="PageCount" class="form-control" />
                 <span asp-validation-for="PageCount" class="text-danger"></span>
-            </div>
+            </div> *@
             <div class="form-group">
-                <label asp-for="CoverImageUrl" class="control-label text-white"></label>
-                <input asp-for="CoverImageUrl" class="form-control" />
-                <span asp-validation-for="CoverImageUrl" class="text-danger"></span>
+                <label asp-for="ImageFile" class="control-label text-white">Cover Image</label>
+                <input asp-for="ImageFile" class="form-control" type="file" accept="image/*" />
+                <span asp-validation-for="ImageFile" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="CategoryId" class="control-label text-white">Category</label>
@@ -58,6 +58,28 @@
                     <option value="">-- Select Book Type --</option>
                 </select>
                 <span asp-validation-for="BookType" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-2">
+                <label class="control-label text-white d-block">Have Read?</label>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" asp-for="HaveRead" value="true" id="haveReadYes">
+                    <label class="form-check-label text-white" for="haveReadYes">Yes</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" asp-for="HaveRead" value="false" id="haveReadNo" checked>
+                    <label class="form-check-label text-white" for="haveReadNo">No</label>
+                </div>
+            </div>
+            <div class="form-group mt-2">
+                <label class="control-label text-white d-block">Wishlist?</label>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" asp-for="IsWishlist" value="true" id="wishYes">
+                    <label class="form-check-label text-white" for="wishYes">Yes</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" asp-for="IsWishlist" value="false" id="wishNo" checked>
+                    <label class="form-check-label text-white" for="wishNo">No</label>
+                </div>
             </div>
             <div class="form-group">
                 <label asp-for="Rating" class="control-label text-white">Rating</label>
@@ -111,7 +133,5 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
-
-[Bind("Id,Title,Author,Genre,PublishedDate,Description,PageCount,CoverImageUrl,CategoryId,BookType,Rating,RatingReason,ImageData,ImageType,UserId")]
 
 

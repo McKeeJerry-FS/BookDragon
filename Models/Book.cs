@@ -55,6 +55,13 @@ public class Book
     public byte[]? ImageData { get; set; }
     public string? ImageType { get; set; }
 
+    // Status Flags
+    [Display(Name = "Have Read?")]
+    public bool HaveRead { get; set; }
+
+    [Display(Name = "Wishlist?")]
+    public bool IsWishlist { get; set; }
+
     // Foreign key for the user who owns this book
     [Required]
     public string? UserId { get; set; }

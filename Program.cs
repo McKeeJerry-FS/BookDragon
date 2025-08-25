@@ -62,10 +62,9 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
 
-// Apply database migrations in production
-if (!app.Environment.IsDevelopment())
+// Apply database migrations and seed data (all environments)
+using (var scope = app.Services.CreateScope())
 {
-    using var scope = app.Services.CreateScope();
     await DataUtility.ManageDataAsync(scope.ServiceProvider);
 }
 

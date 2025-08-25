@@ -6,20 +6,20 @@
 
 <h1 class="subtitle text-danger">Edit</h1>
 
-<h4>@Html.DisplayNameFor(model => model.Title)</h4>
+
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+    <form asp-action="Edit" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
+                <label asp-for="Title" class="control-label text-white"></label>
                 <input asp-for="Title" class="form-control" />
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Author" class="control-label"></label>
+                <label asp-for="Author" class="control-label text-white"></label>
                 <input asp-for="Author" class="form-control" />
                 <span asp-validation-for="Author" class="text-danger"></span>
             </div>
@@ -28,25 +28,38 @@
                 <input asp-for="Genre" class="form-control" />
                 <span asp-validation-for="Genre" class="text-danger"></span>
             </div> *@
-            <div class="form-group">
+            @* <div class="form-group">
                 <label asp-for="PublishedDate" class="control-label text-white"></label>
                 <input asp-for="PublishedDate" class="form-control" type="date" />
                 <span asp-validation-for="PublishedDate" class="text-danger"></span>
-            </div>
+            </div> *@
             <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
+                <label asp-for="Description" class="control-label text-white"></label>
                 <input asp-for="Description" class="form-control" />
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            @* <div class="form-group">
                 <label asp-for="PageCount" class="control-label"></label>
                 <input asp-for="PageCount" class="form-control" />
                 <span asp-validation-for="PageCount" class="text-danger"></span>
-            </div>
+            </div> *@
             <div class="form-group">
-                <label asp-for="CoverImageUrl" class="control-label"></label>
-                <input asp-for="CoverImageUrl" class="form-control" />
-                <span asp-validation-for="CoverImageUrl" class="text-danger"></span>
+                <label class="control-label text-white">Book Cover</label>
+                <div>
+                    @if (Model.ImageData != null && Model.ImageData.Length > 0)
+                    {
+                        var imageBase64 = Convert.ToBase64String(Model.ImageData);
+                        var imageSrc = $"data:{Model.ImageType};base64,{imageBase64}";
+                        <img src="@imageSrc" alt="@Model.Title Cover" class="img-thumbnail mb-2" style="max-width:120px;" />
+                    }
+                    else
+                    {
+                        <img src="/img/img_placeholder.jpg" alt="No Cover" class="img-thumbnail mb-2" style="max-width:120px;" />
+                    }
+                </div>
+                <label asp-for="ImageFile" class="control-label text-white">Add Book Cover</label>
+                <input asp-for="ImageFile" type="file" accept="image/*" class="form-control" />
+                <span asp-validation-for="ImageFile" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="CategoryId" class="control-label text-white">Category</label>
@@ -61,6 +74,28 @@
                     <option value="">-- Select Book Type --</option>
                 </select>
                 <span asp-validation-for="BookType" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-2">
+                <label class="control-label d-block text-white">Have Read?</label>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" asp-for="HaveRead" value="true" id="editHaveReadYes" />
+                    <label class="form-check-label text-white" for="editHaveReadYes">Yes</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" asp-for="HaveRead" value="false" id="editHaveReadNo" />
+                    <label class="form-check-label text-white" for="editHaveReadNo">No</label>
+                </div>
+            </div>
+            <div class="form-group mt-2">
+                <label class="control-label d-block text-white">Wishlist?</label>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" asp-for="IsWishlist" value="true" id="editWishYes" />
+                    <label class="form-check-label text-white" for="editWishYes">Yes</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" asp-for="IsWishlist" value="false" id="editWishNo" />
+                    <label class="form-check-label text-white" for="editWishNo">No</label>
+                </div>
             </div>
             <div class="form-group">
                 <label asp-for="Rating" class="control-label text-white"></label>

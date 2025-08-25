@@ -9,7 +9,11 @@ html {
   }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
@@ -20,12 +24,11 @@ html {
 
 body {
   margin-bottom: 60px;
-  background-image: url("/img/dragons-lair-scenic-backdrop-hero-08a62f.jpg");
+  background-image: url("/img/literary_lair.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
-  
 }
 
 /* Google Fonts */
@@ -34,7 +37,6 @@ body {
   font-weight: 400;
   font-style: normal;
 }
-
 
 .merienda-normal {
   font-family: "Merienda", cursive;
@@ -58,7 +60,7 @@ body {
   color: #9e9e9e;
 }
 
-.lairBtn{
+.lairBtn {
   font-family: "Merienda", system-ui;
   font-weight: 500;
   font-size: 1.5rem;
@@ -68,43 +70,75 @@ body {
   border-radius: 5px;
 }
 
-.lair{
+.lair {
   background-image: url("/img/literary_lair.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
-.coverImg{
-    height: 150px;
+.cave {
+  background-image: url("/img/dragons-lair-scenic-backdrop-hero-08a62f.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+.navbar {
+  opacity: 50%;
+}
+
+thead {
+  opacity: 15%;
+}
+
+thead th {
+  color: white;
+  font-size: 1.15rem;
+}
+
+tbody td {
+  opacity: 75%;
+}
+
+.coverImg {
+  height: 150px;
 }
 
 /* Star Rating Styles */
+/* Star rating left-to-right fill */
 .star-rating {
-    direction: rtl;
-    display: inline-flex;
-    flex-direction: row-reverse;
-    font-size: 2rem;
-    unicode-bidi: bidi-override;
+  direction: ltr; /* normal direction */
+  display: inline-flex;
+  flex-direction: row; /* left to right */
+  font-size: 2rem;
 }
 
-    .star-rating input[type="radio"] {
-        display: none;
-    }
+.star-rating input[type="radio"] {
+  display: none;
+}
 
-    .star-rating label {
-        color: #ddd;
-        cursor: pointer;
-        transition: color 0.2s;
-    }
+.star-rating label {
+  color: #ddd;
+  cursor: pointer;
+  transition: color 0.2s;
+}
 
-        .star-rating label:hover,
-        .star-rating label:hover ~ label,
-        .star-rating input[type="radio"]:checked ~ label {
-            color: #ffc107;
-        }
-
-        .star-rating label:hover {
-            color: #ffb300;
-        }
+/* On hover highlight current and previous stars */
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+  color: #ffc107;
+}
+/* When checked, highlight all preceding siblings (handled by ordering inputs before labels) */
+.star-rating input[type="radio"]:checked ~ label {
+  color: #ffc107;
+}
+.star-rating label:hover {
+  color: #ffb300;
+}
 
 .rating-input {
-    margin: 10px 0;
+  margin: 10px 0;
 }

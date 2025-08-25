@@ -1,25 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace BookDragon.Models
+namespace BookDragon.Models;
+
+public class Category
 {
-    public class Category
-    {
-        public int Id { get; set; }
+    public int Id { get; set; }
 
-        [Required]
-        [StringLength(50, ErrorMessage = "The {0} must be at least {2} and at most {1} characters", MinimumLength = 2)]
-        public string? Name { get; set; }
+    [Required]
+    [StringLength(100)]
+    public string Name { get; set; } = string.Empty;
 
-        [StringLength(200, ErrorMessage = "The {0} must be at least {2} and at most {1} characters", MinimumLength = 2)]
-        public string? Description { get; set; }
-
-        [NotMapped]
-        public IFormFile? ImageFile { get; set; }
-        public byte[]? ImageData { get; set; }
-        public string? ImageType { get; set; }
-
-        // Navigation Props
-        public virtual ICollection<Book> Books { get; set; } = new HashSet<Book>();
-    }
+    [StringLength(200)]
+    public string? Description { get; set; }
 }

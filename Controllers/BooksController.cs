@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BookDragon.Data;
 using BookDragon.Models;
+using BookDragon.Services.Interfaces;
 
 namespace BookDragon.Controllers
 {
@@ -15,10 +16,12 @@ namespace BookDragon.Controllers
     public class BooksController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IImageService _imageService;
 
-        public BooksController(ApplicationDbContext context)
+        public BooksController(ApplicationDbContext context, IImageService imageService)
         {
             _context = context;
+            _imageService = imageService;
         }
 
         // GET: Books
@@ -59,7 +62,7 @@ namespace BookDragon.Controllers
         // POST: Books/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Author,Genre,PublishedDate,Description,PageCount,CoverImageUrl,CategoryId,BookType,Rating,RatingReason,ImageData,ImageType,UserId")] Book book)
+    public async Task<IActionResult> Create([Bind("Id,Title,Author,Genre,PublishedDate,Description,PageCount,CategoryId,BookType,Rating,RatingReason,HaveRead,IsWishlist,ImageFile,UserId")] Book book)
         {
             if (ModelState.IsValid)
             {
@@ -67,6 +70,12 @@ namespace BookDragon.Controllers
                 if (book.PublishedDate.Kind == DateTimeKind.Unspecified)
                 {
                     book.PublishedDate = DateTime.SpecifyKind(book.PublishedDate, DateTimeKind.Utc);
+                }
+                // Process uploaded image
+                if (book.ImageFile != null)
+                {
+                    book.ImageData = await _imageService.ConvertFileToByteArrayAsynC(book.ImageFile);
+                    book.ImageType = book.ImageFile.ContentType;
                 }
                 _context.Add(book);
                 await _context.SaveChangesAsync();
@@ -98,7 +107,7 @@ namespace BookDragon.Controllers
         // POST: Books/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Author,Genre,PublishedDate,Description,PageCount,CoverImageUrl,CategoryId,BookType,Rating,RatingReason,ImageData,ImageType,UserId")] Book book)
+    public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Author,Genre,PublishedDate,Description,PageCount,CategoryId,BookType,Rating,RatingReason,HaveRead,IsWishlist,ImageFile,UserId")] Book book)
         {
             if (id != book.Id)
             {
@@ -109,7 +118,22 @@ namespace BookDragon.Controllers
             {
                 try
                 {
-                    _context.Update(book);
+                    var existingBook = await _context.Books.AsNoTracking().FirstOrDefaultAsync(b => b.Id == id);
+                    if (existingBook == null) return NotFound();
+
+                    // Preserve existing image if no new file uploaded
+                    if (book.ImageFile != null)
+                    {
+                        book.ImageData = await _imageService.ConvertFileToByteArrayAsynC(book.ImageFile);
+                        book.ImageType = book.ImageFile.ContentType;
+                    }
+                    else
+                    {
+                        book.ImageData = existingBook.ImageData;
+                        book.ImageType = existingBook.ImageType;
+                    }
+
+                    _context.Entry(book).State = EntityState.Modified;
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
