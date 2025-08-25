@@ -114,6 +114,14 @@ namespace BookDragon.Controllers
             {
                 ModelState.AddModelError(string.Empty, "Unable to determine current user.");
             }
+            else
+            {
+                // Remove potential ModelState error from [Required] validation that ran before we set UserId
+                if (ModelState.ContainsKey(nameof(book.UserId)))
+                {
+                    ModelState.Remove(nameof(book.UserId));
+                }
+            }
 
             // Convert new upload regardless of model validity so preview persists
             if (book.ImageFile != null)
