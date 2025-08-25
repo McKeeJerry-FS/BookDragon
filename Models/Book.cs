@@ -15,6 +15,7 @@ public class Book
     public string? Title { get; set; }
 
     [Display(Name = "Author")]
+    [Required(ErrorMessage = "Author is required")]
     public string? Author { get; set; }
 
     [Display(Name = "Genre")]
@@ -24,6 +25,7 @@ public class Book
     public DateTime PublishedDate { get; set; }
 
     [Display(Name = "Description")]
+    [Required(ErrorMessage = "Description is required")]
     public string? Description { get; set; }
 
     [Display(Name = "Page Count")]

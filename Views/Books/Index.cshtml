@@ -6,9 +6,54 @@
 
 <h1 class="subtitle text-danger">Lair's Inventory</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+<div class="mb-3 p-3 border rounded bg-dark bg-opacity-50">
+    <form method="get" asp-action="Index" class="row g-2 align-items-end">
+        <div class="col-sm-3">
+            <label for="search" class="form-label text-white">Search</label>
+            <input type="text" id="search" name="search" value="@((string?)ViewData["Search"])" class="form-control" placeholder="Title / Author / Description" />
+        </div>
+        <div class="col-sm-3">
+            <label for="categoryId" class="form-label text-white">Category</label>
+            <select id="categoryId" name="categoryId" class="form-select">
+                <option value="">-- All Categories --</option>
+                @{
+                    var cats = ViewData["Categories"] as SelectList;
+                    var selectedCat = ViewData["FilterCategoryId"] as int?; 
+                    if (cats != null)
+                    {
+                        foreach (var c in cats)
+                        {
+                            <option value="@c.Value" selected="@(selectedCat.HasValue && selectedCat.Value.ToString() == c.Value ? "selected" : null)">@c.Text</option>
+                        }
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-sm-2">
+            <label class="form-label text-white">Have Read</label>
+            <select name="haveRead" class="form-select">
+                <option value="" selected="@(ViewData["FilterHaveRead"] == null ? "selected" : null)">Any</option>
+                <option value="true" selected="@(((bool?)ViewData["FilterHaveRead"]) == true ? "selected" : null)">Yes</option>
+                <option value="false" selected="@(((bool?)ViewData["FilterHaveRead"]) == false ? "selected" : null)">No</option>
+            </select>
+        </div>
+        <div class="col-sm-2">
+            <label class="form-label text-white">Wishlist</label>
+            <select name="wishlist" class="form-select">
+                <option value="" selected="@(ViewData["FilterWishlist"] == null ? "selected" : null)">Any</option>
+                <option value="true" selected="@(((bool?)ViewData["FilterWishlist"]) == true ? "selected" : null)">Yes</option>
+                <option value="false" selected="@(((bool?)ViewData["FilterWishlist"]) == false ? "selected" : null)">No</option>
+            </select>
+        </div>
+        <div class="col-sm-2 d-flex gap-2">
+            <button type="submit" class="btn btn-secondary w-100">Filter</button>
+            <a asp-action="Index" class="btn btn-outline-light">Reset</a>
+        </div>
+    </form>
+    <div class="mt-2">
+        <a asp-action="Create" class="btn btn-primary btn-sm">Add New Book</a>
+    </div>
+</div>
 <table class="table">
     <thead>
         <tr>

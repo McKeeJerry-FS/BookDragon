@@ -60,6 +60,8 @@
                 <label asp-for="ImageFile" class="control-label text-white">Add Book Cover</label>
                 <input asp-for="ImageFile" type="file" accept="image/*" class="form-control" />
                 <span asp-validation-for="ImageFile" class="text-danger"></span>
+                <input type="hidden" asp-for="ImageData" />
+                <input type="hidden" asp-for="ImageType" />
             </div>
             <div class="form-group">
                 <label asp-for="CategoryId" class="control-label text-white">Category</label>

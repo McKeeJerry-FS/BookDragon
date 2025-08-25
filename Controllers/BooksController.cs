@@ -25,10 +25,41 @@ namespace BookDragon.Controllers
         }
 
         // GET: Books
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? search, int? categoryId, bool? haveRead, bool? wishlist)
         {
-            var applicationDbContext = _context.Books.Include(b => b.Category).Include(b => b.User);
-            return View(await applicationDbContext.ToListAsync());
+            var query = _context.Books
+                .Include(b => b.Category)
+                .Include(b => b.User)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                search = search.Trim();
+                query = query.Where(b => (b.Title != null && EF.Functions.ILike(b.Title, $"%{search}%"))
+                                    || (b.Author != null && EF.Functions.ILike(b.Author, $"%{search}%"))
+                                    || (b.Description != null && EF.Functions.ILike(b.Description, $"%{search}%")));
+            }
+            if (categoryId.HasValue && categoryId.Value > 0)
+            {
+                query = query.Where(b => b.CategoryId == categoryId.Value);
+            }
+            if (haveRead.HasValue)
+            {
+                query = query.Where(b => b.HaveRead == haveRead.Value);
+            }
+            if (wishlist.HasValue)
+            {
+                query = query.Where(b => b.IsWishlist == wishlist.Value);
+            }
+
+            ViewData["Categories"] = new SelectList(_context.Categories.OrderBy(c => c.Name).ToList(), "Id", "Name", categoryId);
+            ViewData["Search"] = search;
+            ViewData["FilterCategoryId"] = categoryId;
+            ViewData["FilterHaveRead"] = haveRead;
+            ViewData["FilterWishlist"] = wishlist;
+
+            var results = await query.ToListAsync();
+            return View(results);
         }
 
         // GET: Books/Details/5
@@ -56,26 +87,36 @@ namespace BookDragon.Controllers
         {
             ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
-            return View();
+            // Provide a non-null model instance so the Create view's Model references (image preview, etc.) don't throw
+            return View(new Book());
         }
 
         // POST: Books/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Id,Title,Author,Genre,PublishedDate,Description,PageCount,CategoryId,BookType,Rating,RatingReason,HaveRead,IsWishlist,ImageFile,UserId")] Book book)
+    public async Task<IActionResult> Create([Bind("Id,Title,Author,Genre,PublishedDate,Description,PageCount,CategoryId,BookType,Rating,RatingReason,HaveRead,IsWishlist,ImageFile,ImageData,ImageType,UserId")] Book book)
         {
+            // Normalize strings
+            book.Title = book.Title?.Trim();
+            book.Author = book.Author?.Trim();
+            book.Description = book.Description?.Trim();
+            book.RatingReason = book.RatingReason?.Trim();
+
+            // Convert new upload regardless of model validity so preview persists
+            if (book.ImageFile != null)
+            {
+                book.ImageData = await _imageService.ConvertFileToByteArrayAsynC(book.ImageFile);
+                book.ImageType = book.ImageFile.ContentType;
+            }
+
+            // If no file but ImageData posted back (hidden field after prior failed validation) keep it
+            // (Model binder already populated ImageData from base64 hidden field if present)
+
             if (ModelState.IsValid)
             {
-                // Ensure PublishedDate is UTC for PostgreSQL
-                if (book.PublishedDate.Kind == DateTimeKind.Unspecified)
+                if (book.PublishedDate != default && book.PublishedDate.Kind == DateTimeKind.Unspecified)
                 {
                     book.PublishedDate = DateTime.SpecifyKind(book.PublishedDate, DateTimeKind.Utc);
-                }
-                // Process uploaded image
-                if (book.ImageFile != null)
-                {
-                    book.ImageData = await _imageService.ConvertFileToByteArrayAsynC(book.ImageFile);
-                    book.ImageType = book.ImageFile.ContentType;
                 }
                 _context.Add(book);
                 await _context.SaveChangesAsync();
@@ -107,33 +148,87 @@ namespace BookDragon.Controllers
         // POST: Books/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Author,Genre,PublishedDate,Description,PageCount,CategoryId,BookType,Rating,RatingReason,HaveRead,IsWishlist,ImageFile,UserId")] Book book)
+    public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Author,Genre,PublishedDate,Description,PageCount,CategoryId,BookType,Rating,RatingReason,HaveRead,IsWishlist,ImageFile,ImageData,ImageType")] Book book)
         {
             if (id != book.Id)
             {
                 return NotFound();
             }
 
+            // Fetch existing entity to allow selective updates and persistence of unchanged values
+            var existingBook = await _context.Books.FirstOrDefaultAsync(b => b.Id == id);
+            if (existingBook == null)
+            {
+                return NotFound();
+            }
+
+            // Preserve immutable fields (UserId) and existing image before validation
+            book.UserId = existingBook.UserId; // keep original owner
+            if (ModelState.ContainsKey("UserId")) ModelState.Remove("UserId");
+
+            // Normalize input (trim strings)
+            book.Title = book.Title?.Trim();
+            book.Author = book.Author?.Trim();
+            book.Description = book.Description?.Trim();
+            book.RatingReason = book.RatingReason?.Trim();
+
+            // If a new file uploaded convert immediately so preview persists even on validation failure
+            if (book.ImageFile != null)
+            {
+                book.ImageData = await _imageService.ConvertFileToByteArrayAsynC(book.ImageFile);
+                book.ImageType = book.ImageFile.ContentType;
+            }
+            else if (book.ImageData == null && existingBook.ImageData != null)
+            {
+                // Preserve existing image for redisplay
+                book.ImageData = existingBook.ImageData;
+                book.ImageType = existingBook.ImageType;
+            }
+
+            // Additional defensive validation (in case client-side disabled)
+            if (string.IsNullOrWhiteSpace(book.Title))
+            {
+                ModelState.AddModelError("Title", "Title is required");
+            }
+            if (string.IsNullOrWhiteSpace(book.Author))
+            {
+                ModelState.AddModelError("Author", "Author is required");
+            }
+            if (string.IsNullOrWhiteSpace(book.Description))
+            {
+                ModelState.AddModelError("Description", "Description is required");
+            }
+            if (book.CategoryId <= 0)
+            {
+                ModelState.AddModelError("CategoryId", "Please select a category");
+            }
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    var existingBook = await _context.Books.AsNoTracking().FirstOrDefaultAsync(b => b.Id == id);
-                    if (existingBook == null) return NotFound();
+                    // Update only modifiable fields (prevent accidental overwrites)
+                    existingBook.Title = book.Title;
+                    existingBook.Author = book.Author;
+                    existingBook.Genre = book.Genre;
+                    existingBook.PublishedDate = book.PublishedDate; // if enabled later
+                    existingBook.Description = book.Description;
+                    existingBook.PageCount = book.PageCount;
+                    existingBook.CategoryId = book.CategoryId;
+                    existingBook.BookType = book.BookType;
+                    existingBook.Rating = book.Rating;
+                    existingBook.RatingReason = book.RatingReason;
+                    existingBook.HaveRead = book.HaveRead;
+                    existingBook.IsWishlist = book.IsWishlist;
 
-                    // Preserve existing image if no new file uploaded
+                    // Image: replace only if new file provided
                     if (book.ImageFile != null)
                     {
-                        book.ImageData = await _imageService.ConvertFileToByteArrayAsynC(book.ImageFile);
-                        book.ImageType = book.ImageFile.ContentType;
-                    }
-                    else
-                    {
-                        book.ImageData = existingBook.ImageData;
-                        book.ImageType = existingBook.ImageType;
+                        existingBook.ImageData = await _imageService.ConvertFileToByteArrayAsynC(book.ImageFile);
+                        existingBook.ImageType = book.ImageFile.ContentType;
                     }
 
-                    _context.Entry(book).State = EntityState.Modified;
+                    // Do not alter UserId or ImageData/ImageType (unless new image)
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
