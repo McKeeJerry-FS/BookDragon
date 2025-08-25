@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using BookDragon.Data;
 using BookDragon.Models;
 using BookDragon.Services.Interfaces;
+using Microsoft.AspNetCore.Identity;
 
 namespace BookDragon.Controllers
 {
@@ -17,19 +18,25 @@ namespace BookDragon.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IImageService _imageService;
+        private readonly UserManager<AppUser> _userManager;
 
-        public BooksController(ApplicationDbContext context, IImageService imageService)
+        public BooksController(ApplicationDbContext context, IImageService imageService, UserManager<AppUser> userManager)
         {
             _context = context;
             _imageService = imageService;
+            _userManager = userManager;
         }
 
         // GET: Books
         public async Task<IActionResult> Index(string? search, int? categoryId, bool? haveRead, bool? wishlist)
         {
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId)) return Challenge();
+
             var query = _context.Books
                 .Include(b => b.Category)
                 .Include(b => b.User)
+                .Where(b => b.UserId == userId) // enforce ownership
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(search))
@@ -86,7 +93,6 @@ namespace BookDragon.Controllers
         public IActionResult Create()
         {
             ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
             // Provide a non-null model instance so the Create view's Model references (image preview, etc.) don't throw
             return View(new Book());
         }
@@ -94,13 +100,20 @@ namespace BookDragon.Controllers
         // POST: Books/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Id,Title,Author,Genre,PublishedDate,Description,PageCount,CategoryId,BookType,Rating,RatingReason,HaveRead,IsWishlist,ImageFile,ImageData,ImageType,UserId")] Book book)
+    public async Task<IActionResult> Create([Bind("Id,Title,Author,Genre,PublishedDate,Description,PageCount,CategoryId,BookType,Rating,RatingReason,HaveRead,IsWishlist,ImageFile,ImageData,ImageType")] Book book)
         {
             // Normalize strings
             book.Title = book.Title?.Trim();
             book.Author = book.Author?.Trim();
             book.Description = book.Description?.Trim();
             book.RatingReason = book.RatingReason?.Trim();
+
+            // Assign ownership (ignore any spoofed input)
+            book.UserId = _userManager.GetUserId(User);
+            if (book.UserId == null)
+            {
+                ModelState.AddModelError(string.Empty, "Unable to determine current user.");
+            }
 
             // Convert new upload regardless of model validity so preview persists
             if (book.ImageFile != null)
@@ -123,7 +136,6 @@ namespace BookDragon.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", book.CategoryId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", book.UserId);
             return View(book);
         }
 

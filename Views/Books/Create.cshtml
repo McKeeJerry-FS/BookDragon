@@ -125,10 +125,7 @@
                 <input asp-for="ImageType" class="form-control" />
                 <span asp-validation-for="ImageType" class="text-danger"></span>
             </div> *@
-            <div class="form-group" hidden>
-                <label asp-for="UserId" class="control-label text-danger"></label>
-                <select asp-for="UserId" class ="form-control" asp-items="ViewBag.UserId"></select>
-            </div>
+            @* UserId is set server-side; no field needed *@
             <div class="form-group mt-3">
                 <input type="submit" value="Create" class="btn btn-secondary" />
             </div>
