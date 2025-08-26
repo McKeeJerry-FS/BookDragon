@@ -54,7 +54,7 @@ namespace BookDragon.Controllers
         // POST: Categories/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description,ImageData,ImageType")] Category category)
+        public async Task<IActionResult> Create([Bind("Id,Name,Description")] Category category)
         {
             if (ModelState.IsValid)
             {
@@ -84,7 +84,7 @@ namespace BookDragon.Controllers
         // POST: Categories/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,ImageData,ImageType")] Category category)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description")] Category category)
         {
             if (id != category.Id)
             {
