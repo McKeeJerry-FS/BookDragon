@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BookDragon.Data;
 using BookDragon.Models;
+using Microsoft.Extensions.Logging;
 
 namespace BookDragon.Controllers
 {
@@ -15,10 +16,12 @@ namespace BookDragon.Controllers
     public class CategoriesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<CategoriesController> _logger;
 
-        public CategoriesController(ApplicationDbContext context)
+        public CategoriesController(ApplicationDbContext context, ILogger<CategoriesController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: Categories
@@ -56,12 +59,39 @@ namespace BookDragon.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,Description")] Category category)
         {
-            if (ModelState.IsValid)
+            _logger.LogInformation("Attempting to create category. Name={Name}", category?.Name);
+
+            if (!ModelState.IsValid)
+            {
+                // Log validation errors
+                foreach (var kvp in ModelState.Where(k => k.Value?.Errors?.Count > 0))
+                {
+                    foreach (var err in kvp.Value!.Errors)
+                    {
+                        _logger.LogWarning("ModelState error for key '{Key}': {Error}", kvp.Key, err.ErrorMessage);
+                    }
+                }
+                return View(category);
+            }
+
+            try
             {
                 _context.Add(category);
                 await _context.SaveChangesAsync();
+                _logger.LogInformation("Category created successfully. Id={Id} Name={Name}", category.Id, category.Name);
                 return RedirectToAction(nameof(Index));
             }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Database update exception while creating category Name={Name}", category.Name);
+                ModelState.AddModelError(string.Empty, "An error occurred while saving the category. Please try again.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected exception while creating category Name={Name}", category.Name);
+                ModelState.AddModelError(string.Empty, "An unexpected error occurred. Please try again.");
+            }
+
             return View(category);
         }
 
