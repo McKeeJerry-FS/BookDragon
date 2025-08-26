@@ -108,11 +108,10 @@ tbody td {
 }
 
 /* Star Rating Styles */
-/* Star rating left-to-right fill */
+/* Reverse visual order so selection fills left-to-right */
 .star-rating {
-  direction: ltr; /* normal direction */
   display: inline-flex;
-  flex-direction: row; /* left to right */
+  flex-direction: row-reverse; /* stars 1..5 appear left->right, DOM remains 5..1 for sibling selector logic */
   font-size: 2rem;
 }
 
@@ -126,15 +125,17 @@ tbody td {
   transition: color 0.2s;
 }
 
-/* On hover highlight current and previous stars */
+/* On hover highlight current and all visually previous stars (because of row-reverse) */
 .star-rating label:hover,
 .star-rating label:hover ~ label {
   color: #ffc107;
 }
-/* When checked, highlight all preceding siblings (handled by ordering inputs before labels) */
+
+/* When checked, highlight all preceding DOM siblings which are visually to the left due to row-reverse */
 .star-rating input[type="radio"]:checked ~ label {
   color: #ffc107;
 }
+
 .star-rating label:hover {
   color: #ffb300;
 }
