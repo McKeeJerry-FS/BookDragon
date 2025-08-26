@@ -28,15 +28,26 @@ namespace BookDragon.Controllers
         }
 
         // GET: Books
-        public async Task<IActionResult> Index(string? search, int? categoryId, bool? haveRead, bool? wishlist)
+        public async Task<IActionResult> Index(string? search, int? categoryId, bool? haveRead, bool? wishlist, string? sortOrder)
         {
             var userId = _userManager.GetUserId(User);
             if (string.IsNullOrEmpty(userId)) return Challenge();
 
+            // Sort state (toggle values for links)
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["TitleSort"] = sortOrder == "title" ? "title_desc" : "title";
+            ViewData["AuthorSort"] = sortOrder == "author" ? "author_desc" : "author";
+            ViewData["DescSort"] = sortOrder == "desc" ? "desc_desc" : "desc"; // description
+            ViewData["TypeSort"] = sortOrder == "type" ? "type_desc" : "type"; // book type
+            ViewData["CategorySort"] = sortOrder == "cat" ? "cat_desc" : "cat";
+            ViewData["RatingSort"] = sortOrder == "rating" ? "rating_desc" : "rating";
+            ViewData["HaveReadSort"] = sortOrder == "have" ? "have_desc" : "have";
+            ViewData["WishlistSort"] = sortOrder == "wish" ? "wish_desc" : "wish";
+
             var query = _context.Books
                 .Include(b => b.Category)
                 .Include(b => b.User)
-                .Where(b => b.UserId == userId) // enforce ownership
+                .Where(b => b.UserId == userId)
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(search))
@@ -58,6 +69,28 @@ namespace BookDragon.Controllers
             {
                 query = query.Where(b => b.IsWishlist == wishlist.Value);
             }
+
+            // Apply sorting
+            query = sortOrder switch
+            {
+                "title" => query.OrderBy(b => b.Title),
+                "title_desc" => query.OrderByDescending(b => b.Title),
+                "author" => query.OrderBy(b => b.Author),
+                "author_desc" => query.OrderByDescending(b => b.Author),
+                "desc" => query.OrderBy(b => b.Description),
+                "desc_desc" => query.OrderByDescending(b => b.Description),
+                "type" => query.OrderBy(b => b.BookType),
+                "type_desc" => query.OrderByDescending(b => b.BookType),
+                "cat" => query.OrderBy(b => b.Category!.Name),
+                "cat_desc" => query.OrderByDescending(b => b.Category!.Name),
+                "rating" => query.OrderBy(b => b.Rating ?? 0),
+                "rating_desc" => query.OrderByDescending(b => b.Rating ?? 0),
+                "have" => query.OrderBy(b => b.HaveRead),
+                "have_desc" => query.OrderByDescending(b => b.HaveRead),
+                "wish" => query.OrderBy(b => b.IsWishlist),
+                "wish_desc" => query.OrderByDescending(b => b.IsWishlist),
+                _ => query.OrderBy(b => b.Title)
+            };
 
             ViewData["Categories"] = new SelectList(_context.Categories.OrderBy(c => c.Name).ToList(), "Id", "Name", categoryId);
             ViewData["Search"] = search;

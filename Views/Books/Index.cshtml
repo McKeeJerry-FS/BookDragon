@@ -2,12 +2,20 @@
 
 @{
     ViewData["Title"] = "Index";
+    string? currentSort = ViewData["CurrentSort"] as string;
+    string Icon(string ascKey, string descKey)
+    {
+        if (currentSort == ascKey) return "<i class='bi bi-sort-alpha-down ms-1'></i>"; // currently ascending
+        if (currentSort == descKey) return "<i class='bi bi-sort-alpha-up ms-1'></i>";   // currently descending
+        return "<i class='bi bi-arrow-down-up opacity-50 ms-1'></i>"; // unsorted
+    }
 }
 
 <h1 class="subtitle text-danger">Lair's Inventory</h1>
 
 <div class="mb-3 p-3 border rounded bg-dark bg-opacity-50">
     <form method="get" asp-action="Index" class="row g-2 align-items-end">
+        <input type="hidden" name="sortOrder" value="@currentSort" />
         <div class="col-sm-3">
             <label for="search" class="form-label text-white">Search</label>
             <input type="text" id="search" name="search" value="@((string?)ViewData["Search"])" class="form-control" placeholder="Title / Author / Description" />
@@ -57,38 +65,46 @@
 <table class="table">
     <thead>
         <tr>
+            <th>Cover</th>
             <th>
-                Cover Image
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["TitleSort"]" asp-route-search="@ViewData["Search"]" asp-route-categoryId="@ViewData["FilterCategoryId"]" asp-route-haveRead="@ViewData["FilterHaveRead"]" asp-route-wishlist="@ViewData["FilterWishlist"]">
+                    @Html.DisplayNameFor(model => model.Title) @Html.Raw(Icon("title","title_desc"))
+                </a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Title)
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["AuthorSort"]" asp-route-search="@ViewData["Search"]" asp-route-categoryId="@ViewData["FilterCategoryId"]" asp-route-haveRead="@ViewData["FilterHaveRead"]" asp-route-wishlist="@ViewData["FilterWishlist"]">
+                    @Html.DisplayNameFor(model => model.Author) @Html.Raw(Icon("author","author_desc"))
+                </a>
+            </th>
+            <th class="col-desc">
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["DescSort"]" asp-route-search="@ViewData["Search"]" asp-route-categoryId="@ViewData["FilterCategoryId"]" asp-route-haveRead="@ViewData["FilterHaveRead"]" asp-route-wishlist="@ViewData["FilterWishlist"]">
+                    @Html.DisplayNameFor(model => model.Description) @Html.Raw(Icon("desc","desc_desc"))
+                </a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Author)
-            </th>
-            @* <th>
-                @Html.DisplayNameFor(model => model.PublishedDate)
-            </th> *@
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            @* <th>
-                @Html.DisplayNameFor(model => model.PageCount)
-            </th> *@
-            <th>
-                @Html.DisplayNameFor(model => model.BookType)
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["TypeSort"]" asp-route-search="@ViewData["Search"]" asp-route-categoryId="@ViewData["FilterCategoryId"]" asp-route-haveRead="@ViewData["FilterHaveRead"]" asp-route-wishlist="@ViewData["FilterWishlist"]">
+                    @Html.DisplayNameFor(model => model.BookType) @Html.Raw(Icon("type","type_desc"))
+                </a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Category)
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["CategorySort"]" asp-route-search="@ViewData["Search"]" asp-route-categoryId="@ViewData["FilterCategoryId"]" asp-route-haveRead="@ViewData["FilterHaveRead"]" asp-route-wishlist="@ViewData["Filter Wishlist"]">
+                    @Html.DisplayNameFor(model => model.Category) @Html.Raw(Icon("cat","cat_desc"))
+                </a>
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Rating)
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["RatingSort"]" asp-route-search="@ViewData["Search"]" asp-route-categoryId="@ViewData["FilterCategoryId"]" asp-route-haveRead="@ViewData["FilterHaveRead"]" asp-route-wishlist="@ViewData["FilterWishlist"]">
+                    @Html.DisplayNameFor(model => model.Rating) @Html.Raw(Icon("rating","rating_desc"))
+                </a>
             </th>
             <th>
-                Have Read?
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["HaveReadSort"]" asp-route-search="@ViewData["Search"]" asp-route-categoryId="@ViewData["FilterCategoryId"]" asp-route-haveRead="@ViewData["FilterHaveRead"]" asp-route-wishlist="@ViewData["FilterWishlist"]">
+                    Have Read? @Html.Raw(Icon("have","have_desc"))
+                </a>
             </th>
             <th>
-                Wishlist?
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["WishlistSort"]" asp-route-search="@ViewData["Search"]" asp-route-categoryId="@ViewData["FilterCategoryId"]" asp-route-haveRead="@ViewData["FilterHaveRead"]" asp-route-wishlist="@ViewData["FilterWishlist"]">
+                    Wishlist? @Html.Raw(Icon("wish","wish_desc"))
+                </a>
             </th>
             <th></th>
         </tr>
@@ -108,27 +124,11 @@
                     <img src="/img/img_placeholder.jpg" alt="No Cover Available" class="img-thumbnail" style="max-width: 80px; max-height: 100px;" />
                 }
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Author)
-            </td>
-            @* <td>
-                @Html.DisplayFor(modelItem => item.PublishedDate)
-            </td> *@
-            <td>
-                @(item.Description != null && item.Description.Length > 100 ? item.Description.Substring(0, 100) + "..." : item.Description)
-            </td>
-            @* <td>
-                @Html.DisplayFor(modelItem => item.PageCount)
-            </td> *@
-            <td>
-                @Html.DisplayFor(modelItem => item.BookType)
-            </td>
-            <td>
-                @(item.Category != null ? item.Category.Name : "")
-            </td>
+            <td>@Html.DisplayFor(modelItem => item.Title)</td>
+            <td>@Html.DisplayFor(modelItem => item.Author)</td>
+            <td class="col-desc" title="@item.Description">@(item.Description != null && item.Description.Length > 100 ? item.Description.Substring(0, 100) + "..." : item.Description)</td>
+            <td>@Html.DisplayFor(modelItem => item.BookType)</td>
+            <td>@(item.Category != null ? item.Category.Name : "")</td>
             <td>
                 @if (item.Rating.HasValue)
                 {
@@ -154,12 +154,8 @@
                     <span class="text-muted">Not rated</span>
                 }
             </td>
-            <td>
-                @(item.HaveRead ? "Yes" : "No")
-            </td>
-            <td>
-                @(item.IsWishlist ? "Yes" : "No")
-            </td>
+            <td>@(item.HaveRead ? "Yes" : "No")</td>
+            <td>@(item.IsWishlist ? "Yes" : "No")</td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
