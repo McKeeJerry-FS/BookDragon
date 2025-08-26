@@ -58,8 +58,15 @@ namespace BookDragon.Controllers
         // POST: Categories/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description")] Category category)
+        public async Task<IActionResult> Create([Bind("Name,Description")] Category category)
         {
+            // Force new entity (prevent client-supplied Id collisions)
+            if (category.Id != 0)
+            {
+                _logger.LogWarning("[Category Create] Non-zero Id supplied ({Id}) – resetting to 0.", category.Id);
+                category.Id = 0;
+            }
+
             _logger.LogInformation("[Category Create] Attempting create. Name={Name} DescriptionLength={DescLen}", category?.Name, category?.Description?.Length);
 
             if (!ModelState.IsValid)
