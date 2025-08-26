@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using BookDragon.Data;
 using BookDragon.Models;
 using Microsoft.Extensions.Logging;
+using Npgsql; // for Postgres specific exception details
 
 namespace BookDragon.Controllers
 {
@@ -59,16 +60,15 @@ namespace BookDragon.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,Description")] Category category)
         {
-            _logger.LogInformation("Attempting to create category. Name={Name}", category?.Name);
+            _logger.LogInformation("[Category Create] Attempting create. Name={Name} DescriptionLength={DescLen}", category?.Name, category?.Description?.Length);
 
             if (!ModelState.IsValid)
             {
-                // Log validation errors
                 foreach (var kvp in ModelState.Where(k => k.Value?.Errors?.Count > 0))
                 {
                     foreach (var err in kvp.Value!.Errors)
                     {
-                        _logger.LogWarning("ModelState error for key '{Key}': {Error}", kvp.Key, err.ErrorMessage);
+                        _logger.LogWarning("[Category Create] ModelState error key='{Key}' message='{Error}'", kvp.Key, err.ErrorMessage);
                     }
                 }
                 return View(category);
@@ -76,19 +76,23 @@ namespace BookDragon.Controllers
 
             try
             {
+                // Optional normalization
+                category.Name = category.Name?.Trim();
+                category.Description = category.Description?.Trim();
+
                 _context.Add(category);
                 await _context.SaveChangesAsync();
-                _logger.LogInformation("Category created successfully. Id={Id} Name={Name}", category.Id, category.Name);
+                _logger.LogInformation("[Category Create] Success Id={Id} Name={Name}", category.Id, category.Name);
                 return RedirectToAction(nameof(Index));
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, "Database update exception while creating category Name={Name}", category.Name);
-                ModelState.AddModelError(string.Empty, "An error occurred while saving the category. Please try again.");
+                LogDbUpdateException("Create", ex, category);
+                ModelState.AddModelError(string.Empty, "A database error occurred saving the category. Check logs for details.");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unexpected exception while creating category Name={Name}", category.Name);
+                _logger.LogError(ex, "[Category Create] Unexpected exception Name={Name}", category.Name);
                 ModelState.AddModelError(string.Empty, "An unexpected error occurred. Please try again.");
             }
 
@@ -121,26 +125,51 @@ namespace BookDragon.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
+                foreach (var kvp in ModelState.Where(k => k.Value?.Errors?.Count > 0))
                 {
-                    _context.Update(category);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CategoryExists(category.Id))
+                    foreach (var err in kvp.Value!.Errors)
                     {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
+                        _logger.LogWarning("[Category Edit] ModelState error key='{Key}' message='{Error}'", kvp.Key, err.ErrorMessage);
                     }
                 }
+                return View(category);
+            }
+
+            try
+            {
+                category.Name = category.Name?.Trim();
+                category.Description = category.Description?.Trim();
+
+                _context.Update(category);
+                await _context.SaveChangesAsync();
+                _logger.LogInformation("[Category Edit] Success Id={Id} Name={Name}", category.Id, category.Name);
                 return RedirectToAction(nameof(Index));
             }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!CategoryExists(category.Id))
+                {
+                    _logger.LogWarning("[Category Edit] Concurrency failed. Category not found Id={Id}", category.Id);
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            catch (DbUpdateException ex)
+            {
+                LogDbUpdateException("Edit", ex, category);
+                ModelState.AddModelError(string.Empty, "A database error occurred updating the category. Check logs for details.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "[Category Edit] Unexpected exception Id={Id} Name={Name}", category.Id, category.Name);
+                ModelState.AddModelError(string.Empty, "An unexpected error occurred. Please try again.");
+            }
+
             return View(category);
         }
 
@@ -174,12 +203,42 @@ namespace BookDragon.Controllers
             }
 
             await _context.SaveChangesAsync();
+            _logger.LogInformation("[Category Delete] Deleted Id={Id}", id);
             return RedirectToAction(nameof(Index));
         }
 
         private bool CategoryExists(int id)
         {
             return _context.Categories.Any(e => e.Id == id);
+        }
+
+        private void LogDbUpdateException(string operation, DbUpdateException ex, Category category)
+        {
+            var entrySummaries = ex.Entries.Select(e => new
+            {
+                Entity = e.Entity.GetType().Name,
+                State = e.State.ToString(),
+                CurrentValues = e.CurrentValues.Properties.ToDictionary(p => p.Name, p => e.CurrentValues[p]?.ToString())
+            });
+
+            if (ex.InnerException is PostgresException pg)
+            {
+                _logger.LogError(ex,
+                    "[Category {Operation}] PostgresException Code={Code} Message={MessageText} Detail={Detail} Table={Table} Column={Column} Constraint={Constraint} Name={Name} EntryStates={@Entries}",
+                    operation,
+                    pg.SqlState,
+                    pg.MessageText,
+                    pg.Detail,
+                    pg.TableName,
+                    pg.ColumnName,
+                    pg.ConstraintName,
+                    category?.Name,
+                    entrySummaries);
+            }
+            else
+            {
+                _logger.LogError(ex, "[Category {Operation}] DbUpdateException Name={Name} EntryStates={@Entries}", operation, category?.Name, entrySummaries);
+            }
         }
     }
 }
