@@ -91,11 +91,11 @@ body {
 }
 
 thead {
-  opacity: 15%;
+  opacity: 35%;
 }
 
-thead th {
-  color: white;
+thead th a {
+  color: Black;
   font-size: .75rem;
 }
 
