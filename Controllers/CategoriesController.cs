@@ -83,6 +83,9 @@ namespace BookDragon.Controllers
 
             try
             {
+                // Check and repair sequence BEFORE insert
+                await EnsureCategorySequenceHealthyAsync();
+
                 // Optional normalization
                 category.Name = category.Name?.Trim();
                 category.Description = category.Description?.Trim();
@@ -95,6 +98,25 @@ namespace BookDragon.Controllers
             catch (DbUpdateException ex)
             {
                 LogDbUpdateException("Create", ex, category);
+
+                // If duplicate PK, attempt one automatic sequence repair & retry once
+                if (IsPrimaryKeyViolation(ex))
+                {
+                    _logger.LogWarning("[Category Create] Detected PK violation. Attempting sequence repair and retry.");
+                    try
+                    {
+                        await RepairCategorySequenceAsync(force: true);
+                        _context.Add(category);
+                        await _context.SaveChangesAsync();
+                        _logger.LogInformation("[Category Create] Success after sequence repair. Id={Id} Name={Name}", category.Id, category.Name);
+                        return RedirectToAction(nameof(Index));
+                    }
+                    catch (Exception retryEx)
+                    {
+                        _logger.LogError(retryEx, "[Category Create] Retry after sequence repair failed.");
+                    }
+                }
+
                 ModelState.AddModelError(string.Empty, "A database error occurred saving the category. Check logs for details.");
             }
             catch (Exception ex)
@@ -245,6 +267,66 @@ namespace BookDragon.Controllers
             else
             {
                 _logger.LogError(ex, "[Category {Operation}] DbUpdateException Name={Name} EntryStates={@Entries}", operation, category?.Name, entrySummaries);
+            }
+        }
+
+        private bool IsPrimaryKeyViolation(DbUpdateException ex)
+        {
+            if (ex.InnerException is PostgresException pg)
+            {
+                // 23505 unique_violation
+                return pg.SqlState == PostgresErrorCodes.UniqueViolation && (pg.ConstraintName?.Equals("PK_Categories", StringComparison.OrdinalIgnoreCase) ?? false);
+            }
+            return false;
+        }
+
+        private async Task EnsureCategorySequenceHealthyAsync()
+        {
+            try
+            {
+                await RepairCategorySequenceAsync(force: false);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "[Category Seq] Sequence health check failed (non-fatal)." );
+            }
+        }
+
+        private async Task RepairCategorySequenceAsync(bool force)
+        {
+            // Find sequence name dynamically (handles future refactors)
+            var seqName = await _context.Database.SqlQueryRaw<string>("SELECT pg_get_serial_sequence('\"Categories\"','Id')").FirstAsync();
+            if (string.IsNullOrWhiteSpace(seqName))
+            {
+                _logger.LogWarning("[Category Seq] Could not resolve sequence name for Categories.Id");
+                return;
+            }
+
+            var maxId = await _context.Categories.MaxAsync(c => (int?)c.Id) ?? 0;
+
+            // Get current sequence info
+            var seqInfo = await _context.Database
+                .SqlQueryRaw<(long last_value, bool is_called)>($"SELECT last_value, is_called FROM {seqName}")
+                .FirstAsync();
+
+            var lastValue = seqInfo.last_value;
+            // If sequence not yet called after creation, treat last_value as (start - 1)
+            if (!seqInfo.is_called && lastValue == 1 && maxId == 0)
+            {
+                _logger.LogDebug("[Category Seq] Sequence untouched and table empty - no action needed.");
+                return;
+            }
+
+            if (force || lastValue <= maxId)
+            {
+                var newVal = maxId + 1;
+                _logger.LogWarning("[Category Seq] Repairing sequence {Seq} last_value={Last} maxId={Max} setting to {New}", seqName, lastValue, maxId, newVal);
+                // setval(seq, value, is_called=false) so next nextval returns value
+                await _context.Database.ExecuteSqlRawAsync($"SELECT setval('{{0}}', {{1}}, false)", seqName, newVal);
+            }
+            else
+            {
+                _logger.LogDebug("[Category Seq] Sequence healthy. seq={Seq} last={Last} maxId={Max}", seqName, lastValue, maxId);
             }
         }
     }
