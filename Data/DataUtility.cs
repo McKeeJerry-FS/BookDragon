@@ -9,14 +9,17 @@ namespace BookDragon.Data
     {
         public static string GetConnectionString(IConfiguration configuration)
         {
-            // First check for Railway's DATABASE_URL
-            var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
-            if (!string.IsNullOrEmpty(databaseUrl))
+            // Railway/Heroku style URL (either key)
+            var url =
+                Environment.GetEnvironmentVariable("DATABASE_URL") ??
+                Environment.GetEnvironmentVariable("RAILWAY_DATABASE_URL");
+
+            if (!string.IsNullOrEmpty(url))
             {
-                return BuildConnectionString(databaseUrl);
+                return BuildConnectionString(url);
             }
 
-            // Check for other Railway environment variables
+            // PG* individual variables
             var railwayHost = Environment.GetEnvironmentVariable("PGHOST");
             var railwayPort = Environment.GetEnvironmentVariable("PGPORT");
             var railwayUser = Environment.GetEnvironmentVariable("PGUSER");
@@ -28,43 +31,50 @@ namespace BookDragon.Data
                 return BuildConnectionStringFromParts(railwayHost, railwayPort, railwayUser, railwayPassword, railwayDatabase);
             }
 
-            // Fallback to configuration
+            // Fallback to configuration (appsettings or env ConnectionStrings__DefaultConnection)
             var connectionString = configuration.GetConnectionString("DefaultConnection");
             if (!string.IsNullOrEmpty(connectionString))
             {
                 return connectionString;
             }
 
-            throw new InvalidOperationException("No database connection string found. Please set DATABASE_URL environment variable or configure DefaultConnection.");
+            throw new InvalidOperationException("No database connection string found. Set DATABASE_URL / RAILWAY_DATABASE_URL or PG* vars, or ConnectionStrings:DefaultConnection.");
         }
 
         private static string BuildConnectionString(string databaseUrl)
         {
-            //Provides an object representation of a uniform resource identifier (URI) and easy access to the parts of the URI.
-            var databaseUri = new Uri(databaseUrl);
-            var userInfo = databaseUri.UserInfo.Split(':');
-            //Provides a simple way to create and manage the contents of connection strings used by the NpgsqlConnection class.
+            var uri = new Uri(databaseUrl);
+            var userInfo = uri.UserInfo.Split(':', 2); // in case password contains ':'
+
             var builder = new NpgsqlConnectionStringBuilder
             {
-                Host = databaseUri.Host,
-                Port = databaseUri.Port,
-                Username = userInfo[0],
-                Password = userInfo[1],
-                Database = databaseUri.LocalPath.TrimStart('/'),
+                Host = uri.Host,
+                Port = uri.Port > 0 ? uri.Port : 5432,
+                Username = userInfo.Length > 0 ? userInfo[0] : "",
+                Password = userInfo.Length > 1 ? userInfo[1] : "",
+                Database = uri.LocalPath.TrimStart('/'),
                 SslMode = SslMode.Prefer,
                 TrustServerCertificate = true
             };
+
+            // If querystring includes sslmode require, honor it
+            var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+            if (Enum.TryParse<SslMode>(query.Get("sslmode"), true, out var ssl))
+            {
+                builder.SslMode = ssl;
+            }
+
             return builder.ToString();
         }
 
-        private static string BuildConnectionStringFromParts(string host, string port, string user, string password, string database)
+        private static string BuildConnectionStringFromParts(string host, string? port, string? user, string? password, string database)
         {
             var builder = new NpgsqlConnectionStringBuilder
             {
                 Host = host,
-                Port = !string.IsNullOrEmpty(port) ? int.Parse(port) : 5432,
-                Username = user,
-                Password = password,
+                Port = int.TryParse(port, out var p) ? p : 5432,
+                Username = user ?? "",
+                Password = password ?? "",
                 Database = database,
                 SslMode = SslMode.Prefer,
                 TrustServerCertificate = true
@@ -78,10 +88,8 @@ namespace BookDragon.Data
             var userManagerSvc = serviceProvider.GetRequiredService<UserManager<AppUser>>();
             var configurationSvc = serviceProvider.GetRequiredService<IConfiguration>();
 
-            // align the database by checking the migrations
             await dbContextSvc.Database.MigrateAsync();
 
-            // Seed Categories if none exist
             if (!await dbContextSvc.Categories.AnyAsync())
             {
                 var seedCategories = new List<Category>
