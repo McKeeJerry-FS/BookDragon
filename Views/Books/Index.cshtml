@@ -11,18 +11,27 @@
     }
 }
 
-<h1 class="subtitle text-danger">Lair's Inventory</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="subtitle text-danger mb-0">Lair's Inventory</h1>
+    <a asp-action="Create" class="btn btn-danger btn-lg">
+        <i class="bi bi-plus-circle me-2"></i>Add New Book
+    </a>
+</div>
 
-<div class="mb-3 p-3 border rounded bg-dark bg-opacity-50">
-    <form method="get" asp-action="Index" class="row g-2 align-items-end">
+<div class="mb-4 p-4 rounded-3 bg-dark bg-opacity-75 shadow-lg">
+    <form method="get" asp-action="Index" class="row g-3">
         <input type="hidden" name="sortOrder" value="@currentSort" />
-        <div class="col-sm-3">
-            <label for="search" class="form-label text-white">Search</label>
-            <input type="text" id="search" name="search" value="@((string?)ViewData["Search"])" class="form-control" placeholder="Title / Author / Description" />
+        <div class="col-md-4">
+            <label for="search" class="form-label text-white fw-semibold">
+                <i class="bi bi-search me-2"></i>Search
+            </label>
+            <input type="text" id="search" name="search" value="@((string?)ViewData["Search"])" class="form-control form-control-lg" placeholder="Title / Author / Description" />
         </div>
-        <div class="col-sm-3">
-            <label for="categoryId" class="form-label text-white">Category</label>
-            <select id="categoryId" name="categoryId" class="form-select">
+        <div class="col-md-3">
+            <label for="categoryId" class="form-label text-white fw-semibold">
+                <i class="bi bi-bookmark me-2"></i>Category
+            </label>
+            <select id="categoryId" name="categoryId" class="form-select form-select-lg">
                 <option value="">-- All Categories --</option>
                 @{
                     var cats = ViewData["Categories"] as SelectList;
@@ -37,131 +46,162 @@
                 }
             </select>
         </div>
-        <div class="col-sm-2">
-            <label class="form-label text-white">Have Read</label>
-            <select name="haveRead" class="form-select">
+        <div class="col-md-2">
+            <label class="form-label text-white fw-semibold">
+                <i class="bi bi-check-circle me-2"></i>Have Read
+            </label>
+            <select name="haveRead" class="form-select form-select-lg">
                 <option value="" selected="@(ViewData["FilterHaveRead"] == null ? "selected" : null)">Any</option>
                 <option value="true" selected="@(((bool?)ViewData["FilterHaveRead"]) == true ? "selected" : null)">Yes</option>
                 <option value="false" selected="@(((bool?)ViewData["FilterHaveRead"]) == false ? "selected" : null)">No</option>
             </select>
         </div>
-        <div class="col-sm-2">
-            <label class="form-label text-white">Wishlist</label>
-            <select name="wishlist" class="form-select">
+        <div class="col-md-2">
+            <label class="form-label text-white fw-semibold">
+                <i class="bi bi-heart me-2"></i>Wishlist
+            </label>
+            <select name="wishlist" class="form-select form-select-lg">
                 <option value="" selected="@(ViewData["FilterWishlist"] == null ? "selected" : null)">Any</option>
                 <option value="true" selected="@(((bool?)ViewData["FilterWishlist"]) == true ? "selected" : null)">Yes</option>
                 <option value="false" selected="@(((bool?)ViewData["FilterWishlist"]) == false ? "selected" : null)">No</option>
             </select>
         </div>
-        <div class="col-sm-2 d-flex gap-2">
-            <button type="submit" class="btn btn-secondary w-100">Filter</button>
-            <a asp-action="Index" class="btn btn-outline-light">Reset</a>
+        <div class="col-md-1 d-flex align-items-end">
+            <div class="btn-group w-100" role="group">
+                <button type="submit" class="btn btn-warning btn-lg" title="Apply Filters">
+                    <i class="bi bi-funnel-fill"></i>
+                </button>
+                <a asp-action="Index" class="btn btn-outline-light btn-lg" title="Reset Filters">
+                    <i class="bi bi-arrow-clockwise"></i>
+                </a>
+            </div>
         </div>
     </form>
-    <div class="mt-2">
-        <a asp-action="Create" class="btn btn-primary btn-sm">Add New Book</a>
+</div>
+
+<div class="mb-3 bg-dark bg-opacity-50 p-3 rounded-3">
+    <div class="d-flex flex-wrap gap-2 align-items-center">
+        <span class="text-white fw-semibold me-2">Sort by:</span>
+        <a asp-action="Index" asp-route-sortOrder="@ViewData["TitleSort"]" asp-route-search="@ViewData["Search"]" asp-route-categoryId="@ViewData["FilterCategoryId"]" asp-route-haveRead="@ViewData["FilterHaveRead"]" asp-route-wishlist="@ViewData["FilterWishlist"]" 
+           class="btn btn-sm @(currentSort?.StartsWith("title") == true ? "btn-danger" : "btn-outline-light")">
+            Title @Html.Raw(Icon("title","title_desc"))
+        </a>
+        <a asp-action="Index" asp-route-sortOrder="@ViewData["AuthorSort"]" asp-route-search="@ViewData["Search"]" asp-route-categoryId="@ViewData["FilterCategoryId"]" asp-route-haveRead="@ViewData["FilterHaveRead"]" asp-route-wishlist="@ViewData["FilterWishlist"]"
+           class="btn btn-sm @(currentSort?.StartsWith("author") == true ? "btn-danger" : "btn-outline-light")">
+            Author @Html.Raw(Icon("author","author_desc"))
+        </a>
+        <a asp-action="Index" asp-route-sortOrder="@ViewData["CategorySort"]" asp-route-search="@ViewData["Search"]" asp-route-categoryId="@ViewData["FilterCategoryId"]" asp-route-haveRead="@ViewData["FilterHaveRead"]" asp-route-wishlist="@ViewData["FilterWishlist"]"
+           class="btn btn-sm @(currentSort?.StartsWith("cat") == true ? "btn-danger" : "btn-outline-light")">
+            Category @Html.Raw(Icon("cat","cat_desc"))
+        </a>
+        <a asp-action="Index" asp-route-sortOrder="@ViewData["RatingSort"]" asp-route-search="@ViewData["Search"]" asp-route-categoryId="@ViewData["FilterCategoryId"]" asp-route-haveRead="@ViewData["FilterHaveRead"]" asp-route-wishlist="@ViewData["FilterWishlist"]"
+           class="btn btn-sm @(currentSort?.StartsWith("rating") == true ? "btn-danger" : "btn-outline-light")">
+            Rating @Html.Raw(Icon("rating","rating_desc"))
+        </a>
+        <a asp-action="Index" asp-route-sortOrder="@ViewData["TypeSort"]" asp-route-search="@ViewData["Search"]" asp-route-categoryId="@ViewData["FilterCategoryId"]" asp-route-haveRead="@ViewData["FilterHaveRead"]" asp-route-wishlist="@ViewData["FilterWishlist"]"
+           class="btn btn-sm @(currentSort?.StartsWith("type") == true ? "btn-danger" : "btn-outline-light")">
+            Type @Html.Raw(Icon("type","type_desc"))
+        </a>
     </div>
 </div>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Cover</th>
-            <th>
-                <a asp-action="Index" asp-route-sortOrder="@ViewData["TitleSort"]" asp-route-search="@ViewData["Search"]" asp-route-categoryId="@ViewData["FilterCategoryId"]" asp-route-haveRead="@ViewData["FilterHaveRead"]" asp-route-wishlist="@ViewData["FilterWishlist"]">
-                    @Html.DisplayNameFor(model => model.Title) @Html.Raw(Icon("title","title_desc"))
-                </a>
-            </th>
-            <th>
-                <a asp-action="Index" asp-route-sortOrder="@ViewData["AuthorSort"]" asp-route-search="@ViewData["Search"]" asp-route-categoryId="@ViewData["FilterCategoryId"]" asp-route-haveRead="@ViewData["FilterHaveRead"]" asp-route-wishlist="@ViewData["FilterWishlist"]">
-                    @Html.DisplayNameFor(model => model.Author) @Html.Raw(Icon("author","author_desc"))
-                </a>
-            </th>
-            <th class="col-desc">
-                <a asp-action="Index" asp-route-sortOrder="@ViewData["DescSort"]" asp-route-search="@ViewData["Search"]" asp-route-categoryId="@ViewData["FilterCategoryId"]" asp-route-haveRead="@ViewData["FilterHaveRead"]" asp-route-wishlist="@ViewData["FilterWishlist"]">
-                    @Html.DisplayNameFor(model => model.Description) @Html.Raw(Icon("desc","desc_desc"))
-                </a>
-            </th>
-            <th>
-                <a asp-action="Index" asp-route-sortOrder="@ViewData["TypeSort"]" asp-route-search="@ViewData["Search"]" asp-route-categoryId="@ViewData["FilterCategoryId"]" asp-route-haveRead="@ViewData["FilterHaveRead"]" asp-route-wishlist="@ViewData["FilterWishlist"]">
-                    @Html.DisplayNameFor(model => model.BookType) @Html.Raw(Icon("type","type_desc"))
-                </a>
-            </th>
-            <th>
-                <a asp-action="Index" asp-route-sortOrder="@ViewData["CategorySort"]" asp-route-search="@ViewData["Search"]" asp-route-categoryId="@ViewData["FilterCategoryId"]" asp-route-haveRead="@ViewData["FilterHaveRead"]" asp-route-wishlist="@ViewData["Filter Wishlist"]">
-                    @Html.DisplayNameFor(model => model.Category) @Html.Raw(Icon("cat","cat_desc"))
-                </a>
-            </th>
-            <th>
-                <a asp-action="Index" asp-route-sortOrder="@ViewData["RatingSort"]" asp-route-search="@ViewData["Search"]" asp-route-categoryId="@ViewData["FilterCategoryId"]" asp-route-haveRead="@ViewData["FilterHaveRead"]" asp-route-wishlist="@ViewData["FilterWishlist"]">
-                    @Html.DisplayNameFor(model => model.Rating) @Html.Raw(Icon("rating","rating_desc"))
-                </a>
-            </th>
-            <th>
-                <a asp-action="Index" asp-route-sortOrder="@ViewData["HaveReadSort"]" asp-route-search="@ViewData["Search"]" asp-route-categoryId="@ViewData["FilterCategoryId"]" asp-route-haveRead="@ViewData["FilterHaveRead"]" asp-route-wishlist="@ViewData["FilterWishlist"]">
-                    Have Read? @Html.Raw(Icon("have","have_desc"))
-                </a>
-            </th>
-            <th>
-                <a asp-action="Index" asp-route-sortOrder="@ViewData["WishlistSort"]" asp-route-search="@ViewData["Search"]" asp-route-categoryId="@ViewData["FilterCategoryId"]" asp-route-haveRead="@ViewData["FilterHaveRead"]" asp-route-wishlist="@ViewData["FilterWishlist"]">
-                    Wishlist? @Html.Raw(Icon("wish","wish_desc"))
-                </a>
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
 @foreach (var item in Model) {
-        <tr>
-            <td>
+    <div class="col">
+        <div class="card h-100 book-card shadow-sm bg-dark bg-opacity-75 text-white border-0">
+            <div class="position-relative book-cover-container">
                 @if (item.ImageData != null && item.ImageData.Length > 0)
                 {
                     var imageBase64 = Convert.ToBase64String(item.ImageData);
                     var imageSrc = $"data:{item.ImageType};base64,{imageBase64}";
-                    <img src="@imageSrc" alt="@item.Title Cover" class="img-thumbnail" style="max-width: 80px; max-height: 100px;" />
+                    <img src="@imageSrc" alt="@item.Title Cover" class="card-img-top book-cover" />
                 }
                 else
                 {
-                    <img src="/img/img_placeholder.jpg" alt="No Cover Available" class="img-thumbnail" style="max-width: 80px; max-height: 100px;" />
+                    <img src="/img/img_placeholder.jpg" alt="No Cover Available" class="card-img-top book-cover" />
                 }
-            </td>
-            <td>@Html.DisplayFor(modelItem => item.Title)</td>
-            <td>@Html.DisplayFor(modelItem => item.Author)</td>
-            <td class="col-desc" title="@item.Description">@(item.Description != null && item.Description.Length > 100 ? item.Description.Substring(0, 100) + "..." : item.Description)</td>
-            <td>@Html.DisplayFor(modelItem => item.BookType)</td>
-            <td>@(item.Category != null ? item.Category.Name : "")</td>
-            <td>
-                @if (item.Rating.HasValue)
+                @if (item.IsWishlist)
                 {
-                    <div class="rating-display">
-                        <span class="rating-stars">
-                            @for (int i = 1; i <= 5; i++)
-                            {
-                                if (i <= item.Rating.Value)
-                                {
-                                    <span style="color: #ffc107;">★</span>
-                                }
-                                else
-                                {
-                                    <span style="color: #ddd;">★</span>
-                                }
-                            }
-                        </span>
-                        <small>(@item.Rating.Value/5)</small>
-                    </div>
+                    <span class="position-absolute top-0 end-0 m-2 badge bg-danger">
+                        <i class="bi bi-heart-fill"></i> Wishlist
+                    </span>
                 }
-                else
+                @if (item.HaveRead)
                 {
-                    <span class="text-muted">Not rated</span>
+                    <span class="position-absolute top-0 start-0 m-2 badge bg-success">
+                        <i class="bi bi-check-circle-fill"></i> Read
+                    </span>
                 }
-            </td>
-            <td>@(item.HaveRead ? "Yes" : "No")</td>
-            <td>@(item.IsWishlist ? "Yes" : "No")</td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+            </div>
+            <div class="card-body d-flex flex-column">
+                <h5 class="card-title text-warning fw-bold mb-1">@item.Title</h5>
+                <p class="card-text text-muted mb-2">
+                    <i class="bi bi-person-fill me-1"></i>@item.Author
+                </p>
+                
+                <div class="mb-2">
+                    @if (item.Rating.HasValue)
+                    {
+                        <div class="rating-display d-flex align-items-center">
+                            <span class="rating-stars me-2">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    if (i <= item.Rating.Value)
+                                    {
+                                        <span style="color: #ffc107; font-size: 1.2rem;">★</span>
+                                    }
+                                    else
+                                    {
+                                        <span style="color: #555; font-size: 1.2rem;">★</span>
+                                    }
+                                }
+                            </span>
+                            <small class="text-white-50">(@item.Rating.Value/5)</small>
+                        </div>
+                    }
+                    else
+                    {
+                        <span class="text-muted small"><i class="bi bi-star"></i> Not rated</span>
+                    }
+                </div>
+
+                <p class="card-text small text-white-50 mb-2" style="flex-grow: 1; max-height: 4.5em; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;">
+                    @item.Description
+                </p>
+                
+                <div class="mb-3">
+                    <span class="badge bg-secondary me-1">
+                        <i class="bi bi-bookmark-fill me-1"></i>@(item.Category != null ? item.Category.Name : "Uncategorized")
+                    </span>
+                    <span class="badge bg-info">
+                        @item.BookType
+                    </span>
+                </div>
+
+                <div class="btn-group mt-auto" role="group">
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info" title="View Details">
+                        <i class="bi bi-eye-fill"></i>
+                    </a>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning" title="Edit">
+                        <i class="bi bi-pencil-fill"></i>
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger" title="Delete">
+                        <i class="bi bi-trash-fill"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 }
-    </tbody>
-</table>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info text-center py-5 bg-dark bg-opacity-75 text-white border-0" role="alert">
+        <i class="bi bi-inbox display-1 d-block mb-3"></i>
+        <h4>No books found</h4>
+        <p>Try adjusting your filters or add a new book to your collection.</p>
+        <a asp-action="Create" class="btn btn-danger mt-3">
+            <i class="bi bi-plus-circle me-2"></i>Add Your First Book
+        </a>
+    </div>
+}

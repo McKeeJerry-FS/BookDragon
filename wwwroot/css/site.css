@@ -119,6 +119,128 @@ tbody td {
   text-overflow: ellipsis;
 }
 
+/* Modern Book Card Styles */
+.book-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.book-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(255, 0, 0, 0.3) !important;
+}
+
+.book-cover-container {
+  height: 400px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.book-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  transition: transform 0.3s ease;
+  padding: 0.5rem;
+}
+
+.book-card:hover .book-cover {
+  transform: scale(1.05);
+}
+
+.card-title {
+  font-size: 1.1rem;
+  line-height: 1.3;
+  min-height: 2.6em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.rating-display {
+  display: inline-flex;
+  align-items: center;
+}
+
+.btn-group .btn {
+  transition: all 0.2s ease;
+}
+
+.btn-group .btn:hover {
+  transform: scale(1.1);
+  z-index: 1;
+}
+
+/* Book Detail Page Styles */
+.book-detail-card {
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.book-detail-cover-container {
+  height: 500px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.book-detail-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  border-radius: 0.5rem;
+}
+
+.rating-display-large {
+  padding: 1rem;
+  background: rgba(255, 193, 7, 0.1);
+  border-radius: 0.5rem;
+}
+
+.info-card {
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.info-card:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 193, 7, 0.3);
+  transform: translateY(-2px);
+}
+
+.rating-reason-card {
+  transition: all 0.3s ease;
+}
+
+.rating-reason-card:hover {
+  background: rgba(255, 193, 7, 0.15) !important;
+  transform: translateX(5px);
+}
+
+.description-section {
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 991px) {
+  .book-detail-card {
+    position: relative !important;
+    top: 0 !important;
+  }
+}
+
 /* Star Rating Styles */
 /* Reverse visual order so selection fills left-to-right */
 .star-rating {
