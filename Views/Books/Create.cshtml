@@ -4,141 +4,243 @@
     ViewData["Title"] = "Create";
 }
 
-<h1 class="subtitle text-danger">Add a New Book</h1>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-    <form asp-action="Create" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Title" class="control-label text-white"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Author" class="control-label text-white"></label>
-                <input asp-for="Author" class="form-control" />
-                <span asp-validation-for="Author" class="text-danger"></span>
-            </div>
-            @* <div class="form-group">
-                <label asp-for="Genre" class="control-label text-white"></label>
-                <input asp-for="Genre" class="form-control" />
-                <span asp-validation-for="Genre" class="text-danger"></span>
-            </div> *@
-            @* <div class="form-group">
-                <label asp-for="PublishedDate" class="control-label text-white"></label>
-                <input asp-for="PublishedDate" class="form-control" type="date" />
-                <span asp-validation-for="PublishedDate" class="text-danger"></span>
-            </div> *@
-            <div class="form-group">
-                <label asp-for="Description" class="control-label text-white"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            @* <div class="form-group">
-                <label asp-for="PageCount" class="control-label text-white"></label>
-                <input asp-for="PageCount" class="form-control" />
-                <span asp-validation-for="PageCount" class="text-danger"></span>
-            </div> *@
-            <div class="form-group">
-                <label asp-for="ImageFile" class="control-label text-white">Cover Image</label>
-                <input asp-for="ImageFile" class="form-control" type="file" accept="image/*" />
-                <span asp-validation-for="ImageFile" class="text-danger"></span>
-                @if (Model.ImageData != null && Model.ImageData.Length > 0)
-                {
-                    var imageBase64 = Convert.ToBase64String(Model.ImageData);
-                    var imageSrc = $"data:{Model.ImageType};base64,{imageBase64}";
-                    <div class="mt-2">
-                        <img src="@imageSrc" alt="Preview" class="img-thumbnail" style="max-width:120px;" />
-                    </div>
-                }
-                <input type="hidden" asp-for="ImageType" />
-                <input type="hidden" asp-for="ImageData" />
-            </div>
-            <div class="form-group">
-                <label asp-for="CategoryId" class="control-label text-white">Category</label>
-                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId">
-                    <option value="">-- Select a Category --</option>
-                </select>
-                <span asp-validation-for="CategoryId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="BookType" class="control-label text-white">Book Type</label>
-                <select asp-for="BookType" class="form-control" asp-items="Html.GetEnumSelectList<BookDragon.Enums.BookType>()">
-                    <option value="">-- Select Book Type --</option>
-                </select>
-                <span asp-validation-for="BookType" class="text-danger"></span>
-            </div>
-            <div class="form-group mt-2">
-                <label class="control-label text-white d-block">Have Read?</label>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" asp-for="HaveRead" value="true" id="haveReadYes">
-                    <label class="form-check-label text-white" for="haveReadYes">Yes</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" asp-for="HaveRead" value="false" id="haveReadNo" checked>
-                    <label class="form-check-label text-white" for="haveReadNo">No</label>
-                </div>
-            </div>
-            <div class="form-group mt-2">
-                <label class="control-label text-white d-block">Wishlist?</label>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" asp-for="IsWishlist" value="true" id="wishYes">
-                    <label class="form-check-label text-white" for="wishYes">Yes</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" asp-for="IsWishlist" value="false" id="wishNo" checked>
-                    <label class="form-check-label text-white" for="wishNo">No</label>
-                </div>
-            </div>
-            <div class="form-group">
-                <label asp-for="Rating" class="control-label text-white">Rating</label>
-                <div class="rating-input">
-                    <div class="star-rating">
-                        <input type="radio" id="star5" name="Rating" value="5" />
-                        <label for="star5" title="5 stars">★</label>
-                        <input type="radio" id="star4" name="Rating" value="4" />
-                        <label for="star4" title="4 stars">★</label>
-                        <input type="radio" id="star3" name="Rating" value="3" />
-                        <label for="star3" title="3 stars">★</label>
-                        <input type="radio" id="star2" name="Rating" value="2" />
-                        <label for="star2" title="2 stars">★</label>
-                        <input type="radio" id="star1" name="Rating" value="1" />
-                        <label for="star1" title="1 star">★</label>
-                    </div>
-                </div>
-                <span asp-validation-for="Rating" class="text-danger"></span>
-            </div>
-            
-            <div class="form-group">
-                <label asp-for="RatingReason" class="control-label text-white">Why did you give this rating?</label>
-                <textarea asp-for="RatingReason" class="form-control" rows="3" placeholder="Share your thoughts about this book...">@Model.RatingReason</textarea>
-                <span asp-validation-for="RatingReason" class="text-danger"></span>
-            </div>
-            @* <div class="form-group">
-                <label asp-for="ImageData" class="control-label text-danger"></label>
-                <input asp-for="ImageData" class="form-control" />
-                <span asp-validation-for="ImageData" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ImageType" class="control-label text-danger"></label>
-                <input asp-for="ImageType" class="form-control" />
-                <span asp-validation-for="ImageType" class="text-danger"></span>
-            </div> *@
-            @* UserId is set server-side; no field needed *@
-            <div class="form-group mt-3">
-                <input type="submit" value="Create" class="btn btn-secondary" />
-            </div>
-        </form>
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="subtitle text-danger mb-0">
+            <i class="bi bi-plus-circle me-2"></i>Add a New Book
+        </h1>
+        <a asp-action="Index" class="btn btn-outline-light">
+            <i class="bi bi-arrow-left me-2"></i>Back to List
+        </a>
     </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+    <form asp-action="Create" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger bg-danger bg-opacity-75 border-0"></div>
+        
+        <div class="row g-4">
+            <!-- Left Column: Cover Image -->
+            <div class="col-lg-4">
+                <div class="card bg-dark bg-opacity-75 border-0 shadow-lg sticky-top" style="top: 20px;">
+                    <div class="card-header bg-danger bg-opacity-75 border-0">
+                        <h5 class="mb-0 text-white">
+                            <i class="bi bi-image me-2"></i>Book Cover
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="cover-upload-area text-center">
+                            <div id="imagePreview" class="image-preview-container mb-3">
+                                @if (Model?.ImageData != null && Model.ImageData.Length > 0)
+                                {
+                                    var imageBase64 = Convert.ToBase64String(Model.ImageData);
+                                    var imageSrc = $"data:{Model.ImageType};base64,{imageBase64}";
+                                    <img src="@imageSrc" alt="Preview" class="preview-image" />
+                                }
+                                else
+                                {
+                                    <div class="empty-preview">
+                                        <i class="bi bi-image display-1 text-muted"></i>
+                                        <p class="text-muted mt-2">No image selected</p>
+                                    </div>
+                                }
+                            </div>
+                            <label for="ImageFile" class="btn btn-warning w-100 mb-2">
+                                <i class="bi bi-upload me-2"></i>Choose Cover Image
+                            </label>
+                            <input asp-for="ImageFile" class="form-control d-none" type="file" accept="image/*" id="ImageFile" onchange="previewImage(this)" />
+                            <span asp-validation-for="ImageFile" class="text-danger d-block mt-2"></span>
+                            <small class="text-white-50">Recommended: 600x900px</small>
+                            <input type="hidden" asp-for="ImageType" />
+                            <input type="hidden" asp-for="ImageData" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Book Information -->
+            <div class="col-lg-8">
+                <!-- Basic Information -->
+                <div class="card bg-dark bg-opacity-75 border-0 shadow-lg mb-4">
+                    <div class="card-header bg-warning bg-opacity-75 border-0">
+                        <h5 class="mb-0 text-dark">
+                            <i class="bi bi-info-circle me-2"></i>Basic Information
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="Title" class="form-label text-white fw-semibold">
+                                    <i class="bi bi-book me-2"></i>Title *
+                                </label>
+                                <input asp-for="Title" class="form-control form-control-lg" placeholder="Enter book title" />
+                                <span asp-validation-for="Title" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Author" class="form-label text-white fw-semibold">
+                                    <i class="bi bi-person me-2"></i>Author *
+                                </label>
+                                <input asp-for="Author" class="form-control form-control-lg" placeholder="Enter author name" />
+                                <span asp-validation-for="Author" class="text-danger"></span>
+                            </div>
+                            <div class="col-12">
+                                <label asp-for="Description" class="form-label text-white fw-semibold">
+                                    <i class="bi bi-file-text me-2"></i>Description
+                                </label>
+                                <textarea asp-for="Description" class="form-control" rows="4" placeholder="Enter a brief description of the book..."></textarea>
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Classification -->
+                <div class="card bg-dark bg-opacity-75 border-0 shadow-lg mb-4">
+                    <div class="card-header bg-info bg-opacity-75 border-0">
+                        <h5 class="mb-0 text-white">
+                            <i class="bi bi-tags me-2"></i>Classification
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="CategoryId" class="form-label text-white fw-semibold">
+                                    <i class="bi bi-bookmark me-2"></i>Category
+                                </label>
+                                <select asp-for="CategoryId" class="form-select form-select-lg" asp-items="ViewBag.CategoryId">
+                                    <option value="">-- Select a Category --</option>
+                                </select>
+                                <span asp-validation-for="CategoryId" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="BookType" class="form-label text-white fw-semibold">
+                                    <i class="bi bi-book-half me-2"></i>Book Type
+                                </label>
+                                <select asp-for="BookType" class="form-select form-select-lg" asp-items="Html.GetEnumSelectList<BookDragon.Enums.BookType>()">
+                                    <option value="">-- Select Book Type --</option>
+                                </select>
+                                <span asp-validation-for="BookType" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status & Preferences -->
+                <div class="card bg-dark bg-opacity-75 border-0 shadow-lg mb-4">
+                    <div class="card-header bg-success bg-opacity-75 border-0">
+                        <h5 class="mb-0 text-white">
+                            <i class="bi bi-check-square me-2"></i>Status & Preferences
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label class="form-label text-white fw-semibold d-block">
+                                    <i class="bi bi-check-circle me-2"></i>Have Read?
+                                </label>
+                                <div class="btn-group w-100" role="group">
+                                    <input type="radio" class="btn-check" asp-for="HaveRead" value="true" id="haveReadYes">
+                                    <label class="btn btn-outline-success" for="haveReadYes">
+                                        <i class="bi bi-check-lg me-1"></i>Yes
+                                    </label>
+                                    <input type="radio" class="btn-check" asp-for="HaveRead" value="false" id="haveReadNo" checked>
+                                    <label class="btn btn-outline-success" for="haveReadNo">
+                                        <i class="bi bi-x-lg me-1"></i>No
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label text-white fw-semibold d-block">
+                                    <i class="bi bi-heart me-2"></i>Wishlist?
+                                </label>
+                                <div class="btn-group w-100" role="group">
+                                    <input type="radio" class="btn-check" asp-for="IsWishlist" value="true" id="wishYes">
+                                    <label class="btn btn-outline-danger" for="wishYes">
+                                        <i class="bi bi-heart-fill me-1"></i>Yes
+                                    </label>
+                                    <input type="radio" class="btn-check" asp-for="IsWishlist" value="false" id="wishNo" checked>
+                                    <label class="btn btn-outline-danger" for="wishNo">
+                                        <i class="bi bi-heart me-1"></i>No
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rating & Review -->
+                <div class="card bg-dark bg-opacity-75 border-0 shadow-lg mb-4">
+                    <div class="card-header bg-secondary bg-opacity-75 border-0">
+                        <h5 class="mb-0 text-white">
+                            <i class="bi bi-star me-2"></i>Rating & Review
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-4">
+                            <label asp-for="Rating" class="form-label text-white fw-semibold d-block mb-3">
+                                <i class="bi bi-star-fill me-2"></i>Your Rating
+                            </label>
+                            <div class="rating-input text-center">
+                                <div class="star-rating">
+                                    <input type="radio" id="star5" name="Rating" value="5" />
+                                    <label for="star5" title="5 stars">★</label>
+                                    <input type="radio" id="star4" name="Rating" value="4" />
+                                    <label for="star4" title="4 stars">★</label>
+                                    <input type="radio" id="star3" name="Rating" value="3" />
+                                    <label for="star3" title="3 stars">★</label>
+                                    <input type="radio" id="star2" name="Rating" value="2" />
+                                    <label for="star2" title="2 stars">★</label>
+                                    <input type="radio" id="star1" name="Rating" value="1" />
+                                    <label for="star1" title="1 star">★</label>
+                                </div>
+                                <p class="text-white-50 small mt-2">Click to rate (optional)</p>
+                            </div>
+                            <span asp-validation-for="Rating" class="text-danger"></span>
+                        </div>
+                        
+                        <div>
+                            <label asp-for="RatingReason" class="form-label text-white fw-semibold">
+                                <i class="bi bi-chat-quote me-2"></i>Your Thoughts
+                            </label>
+                            <textarea asp-for="RatingReason" class="form-control" rows="4" placeholder="Share your thoughts about this book... (optional)">@Model?.RatingReason</textarea>
+                            <span asp-validation-for="RatingReason" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="card bg-dark bg-opacity-75 border-0 shadow-lg">
+                    <div class="card-body p-4">
+                        <div class="d-flex gap-3 justify-content-end">
+                            <a asp-action="Index" class="btn btn-outline-light btn-lg">
+                                <i class="bi bi-x-circle me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="bi bi-save me-2"></i>Create Book
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function previewImage(input) {
+            const preview = document.getElementById('imagePreview');
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    preview.innerHTML = '<img src="' + e.target.result + '" alt="Preview" class="preview-image" />';
+                }
+                
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
 }
 
 
